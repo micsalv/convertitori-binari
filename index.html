@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--
+    Autore:      prof. Michele SALVEMINI
+    File:        index.html - pagina di navigazione dei convertitori
+    Obiettivo:   Accesso ai tre strumenti didattici di conversione di base
+    Versione:    1.0
+    Data:        01/10/2026
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Raccolta di strumenti interattivi per lo studio delle conversioni tra sistemi di numerazione: binario, decimale, base N e basi potenza di 2.">
+    <meta name="author" content="prof. Michele SALVEMINI">
+    <title>Convertitori di Base - Strumenti Didattici</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Intestazione del documento -->
+    <header class="masthead">
+        <div>
+            <h1>Convertitori di Base</h1>
+            <p>Strumenti interattivi per lo studio delle conversioni tra sistemi di numerazione.</p>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- Introduzione -->
+        <section class="widget-card">
+            <h2 class="widget-title">
+                <span>Scegli lo strumento</span>
+                <span class="widget-suggerimento">Tre convertitori, dal più semplice al più avanzato</span>
+            </h2>
+
+            <p class="intro-text">
+                Ogni strumento mostra passo passo il metodo di conversione: puoi
+                modificare i valori, osservare i passaggi e verificare i risultati.
+                Basta aprire la scheda che ti interessa, non serve installare nulla.
+            </p>
+
+            <!-- Schede dei tre strumenti -->
+            <div class="cards-grid">
+
+                <a class="tool-card" href="./binario-decimale/">
+                    <span class="tool-badge">1</span>
+                    <h3>Binario &harr; Decimale</h3>
+                    <p class="tool-desc">
+                        Metodo posizionale con visualizzazione dei pesi e
+                        metodo delle divisioni successive per il passaggio inverso.
+                    </p>
+                    <ul class="tool-dettagli">
+                        <li>Pulsanti dei bit, slider e campo numerico</li>
+                        <li>Tabella delle divisioni per 2</li>
+                        <li>Adatto come prima introduzione</li>
+                    </ul>
+                    <span class="tool-azione">Apri lo strumento &rarr;</span>
+                </a>
+
+                <a class="tool-card" href="./base-n/">
+                    <span class="tool-badge">2</span>
+                    <h3>Base N &harr; Decimale</h3>
+                    <p class="tool-desc">
+                        Conversione generica tra una base a scelta (2, 4, 8, 16, 32)
+                        e il sistema decimale, in entrambe le direzioni.
+                    </p>
+                    <ul class="tool-dettagli">
+                        <li>Selettore della base di lavoro</li>
+                        <li>Visualizzazione dei passaggi</li>
+                        <li>Utile dopo aver capito il binario</li>
+                    </ul>
+                    <span class="tool-azione">Apri lo strumento &rarr;</span>
+                </a>
+
+                <a class="tool-card" href="./potenze-di-2/">
+                    <span class="tool-badge">3</span>
+                    <h3>Binario &harr; Base 2<sup>n</sup></h3>
+                    <p class="tool-desc">
+                        Il metodo dei raggruppamenti dei bit per passare
+                        rapidamente da binario a base 4, 8, 16 e 32.
+                    </p>
+                    <ul class="tool-dettagli">
+                        <li>Fino a 32 bit in ingresso</li>
+                        <li>Gruppi colorati con cifra corrispondente</li>
+                        <li>Padding a sinistra evidenziato</li>
+                    </ul>
+                    <span class="tool-azione">Apri lo strumento &rarr;</span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Nota didattica -->
+        <section class="scheda-stampa">
+            <div class="scheda-intestazione">
+                <h2>Nota per gli studenti</h2>
+                <p>Come usare al meglio questi strumenti.</p>
+            </div>
+
+            <div class="callout-box">
+                <strong>Consiglio:</strong> prima prova a fare la conversione a mano
+                su un foglio, poi usa lo strumento per verificare il tuo risultato.
+                Se il risultato non coincide, leggi i passaggi mostrati e cerca di
+                capire dove hai sbagliato.
+            </div>
+
+            <h3>Ordine consigliato di utilizzo</h3>
+            <ol class="procedura">
+                <li>Inizia con <strong>Binario &harr; Decimale</strong>, che spiega i concetti di base.</li>
+                <li>Passa a <strong>Base N &harr; Decimale</strong> per generalizzare il metodo.</li>
+                <li>Concludi con <strong>Binario &harr; Base 2<sup>n</sup></strong>, che mostra la scorciatoia dei raggruppamenti.</li>
+            </ol>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <span>Raccolta di strumenti didattici &mdash; Sistemi numerici posizionali</span>
+        <span>prof. Michele SALVEMINI</span>
+    </footer>
+
+</body>
+</html>
