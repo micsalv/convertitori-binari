@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--
+    Autore:      prof. Michele SALVEMINI
+    Classe:      ---
+    Argomento:   Sistemi di numerazione - conversioni di base
+    Obiettivo:   Supporto allo studio delle conversioni di base da un sistema
+                 ad un altro (conversioni bidirezionali tra base 10 e base N,
+                 con 2 <= N <= 16)
+    Versione:    2.0
+    Data:        26/09/2026
+    Note:        Progettato come pagina gemella del convertitore binario-
+                 decimale: stessa struttura, stesso stile, stesse convenzioni.
+                 Come nella pagina gemella, la conversione e' bidirezionale
+                 e i due widget restano sincronizzati tra loro.
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Supporto allo studio delle conversioni di base da un sistema ad un altro: convertitore interattivo bidirezionale tra base 10 e una base qualsiasi N, con calcolo posizionale e divisioni successive.">
+    <meta name="author" content="prof. Michele SALVEMINI">
+    <title>Convertitore Base N &harr; Base 10</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Intestazione del documento -->
+    <header class="masthead">
+        <div>
+            <h1>Convertitore Base N &harr; Base 10</h1>
+            <p>Strumento didattico interattivo per le conversioni bidirezionali tra base 10 e una base qualsiasi, con calcolo posizionale e divisioni successive.</p>
+        </div>
+        <button type="button" id="pulsante-stampa" class="print-btn">Stampa PDF</button>
+    </header>
+
+    <main>
+
+        <!-- Scelta della base di destinazione: slider con lettura grande.
+             L'intervallo [2, 16] e' fisso, quindi lo slider vincola da solo
+             la scelta a valori validi, senza bisogno di messaggi di errore.
+             Il valore scelto vale per entrambi i widget. -->
+        <section class="widget-card" aria-labelledby="titolo-base">
+            <h2 class="widget-title" id="titolo-base">
+                <span>Base di conversione N</span>
+                <span class="widget-suggerimento">Una sola base per tutti i widget</span>
+            </h2>
+
+            <div class="slider-row">
+                <label for="slider-base">Base N:</label>
+                <input type="range" id="slider-base" min="2" max="16" value="2" step="1">
+                <output class="base-display" id="display-base" for="slider-base">2</output>
+            </div>
+
+            <!-- Legenda delle cifre letterali: visibile solo quando serve,
+                 cioe' quando la base supera 10 (cifre da 0 a N-1) -->
+            <p class="legenda-cifre" id="legenda-cifre" hidden>
+                <strong>Attenzione:</strong> in base <span id="legenda-base"></span> le cifre vanno da 0
+                a <span id="legenda-cifra-massima"></span>. I resti dal valore 10 in poi si scrivono
+                con le lettere: 10 = A, 11 = B, 12 = C, 13 = D, 14 = E, 15 = F.
+            </p>
+        </section>
+
+        <!-- WIDGET 1: BASE N -> DECIMALE -->
+        <section class="widget-card" aria-labelledby="titolo-n2d">
+            <h2 class="widget-title" id="titolo-n2d">
+                <span>1. Conversione da Base N a Decimale (Calcolo Posizionale)</span>
+                <span class="widget-suggerimento">Inserisci un numero nella base scelta</span>
+            </h2>
+
+            <div class="input-row">
+                <label for="input-base-n">Inserisci numero in base <span class="base-riferimento">2</span>:</label>
+                <input type="text" id="input-base-n" value="101101" autocomplete="off" spellcheck="false">
+            </div>
+
+            <!-- Sviluppo posizionale: una riga per ogni cifra, con peso e contributo -->
+            <div class="table-scroll">
+                <table class="table-divs">
+                    <caption class="visually-hidden">Sviluppo posizionale delle cifre del numero in base N</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Posizione</th>
+                            <th scope="col">Cifra</th>
+                            <th scope="col">Peso</th>
+                            <th scope="col">Cifra &times; Peso</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo-tabella-posizionale"></tbody>
+                </table>
+            </div>
+
+            <p class="math-box" id="risultato-n2d" aria-live="polite"></p>
+        </section>
+
+        <!-- WIDGET 2: DECIMALE -> BASE N -->
+        <section class="widget-card" aria-labelledby="titolo-d2n">
+            <h2 class="widget-title" id="titolo-d2n">
+                <span>2. Conversione da Decimale a Base N (Divisioni Successive)</span>
+                <span class="widget-suggerimento">Modifica il valore per vedere i passaggi</span>
+            </h2>
+
+            <div class="input-row">
+                <label for="input-decimale">Inserisci numero decimale (0-255):</label>
+                <input type="number" id="input-decimale" min="0" max="255" value="45">
+            </div>
+
+            <div class="division-grid">
+                <div class="table-scroll">
+                    <table class="table-divs">
+                        <caption class="visually-hidden">Tabella dei passaggi delle divisioni successive per la base scelta</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Passo</th>
+                                <th scope="col" id="intestazione-divisione">Divisione (&divide; 2)</th>
+                                <th scope="col">Quoziente</th>
+                                <th scope="col">Resto (Cifra)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpo-tabella-divisioni"></tbody>
+                    </table>
+                </div>
+                <div class="arrow-box">
+                    <span class="arrow-label">Lettura resti</span>
+                    <div class="arrow-graphic" aria-hidden="true">&uarr;</div>
+                    <span class="arrow-sublabel">Dal basso (pi&ugrave; significativo) all'alto</span>
+                </div>
+            </div>
+
+            <p class="math-box" id="risultato-d2n" aria-live="polite"></p>
+        </section>
+
+        <!-- SCHEDA RIEPILOGATIVA STAMPABILE -->
+        <section class="scheda-stampa" aria-labelledby="titolo-scheda">
+            <div class="scheda-intestazione">
+                <h2 id="titolo-scheda">Report Sintetico &amp; Quadro Teorico</h2>
+                <p>Riepilogo delle regole di conversione tra base 10 e base N in formato stampabile (PDF).</p>
+            </div>
+
+            <div class="callout-box">
+                <strong>Regola generale di conversione:</strong><br>
+                Per convertire un numero da base 10 a una base N qualsiasi si applica il metodo delle
+                divisioni successive: si divide per N, si annota il resto (sempre compreso tra 0 e N-1)
+                e si ripete con il quoziente fino ad ottenere 0. Il risultato si legge dai resti,
+                dall'ultimo calcolato al primo. Per la conversione inversa, da base N a base 10, si
+                applica il calcolo posizionale: ogni cifra si moltiplica per il peso N<sup>posizione</sup>
+                e si sommano i contributi.
+            </div>
+
+            <h3>Tabella delle Cifre per Basi maggiori di 10</h3>
+            <div class="table-scroll">
+                <table class="summary-table">
+                    <caption class="visually-hidden">Corrispondenza tra resti dal valore 10 al 15 e cifre letterali</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Resto</th>
+                            <th scope="col">10</th>
+                            <th scope="col">11</th>
+                            <th scope="col">12</th>
+                            <th scope="col">13</th>
+                            <th scope="col">14</th>
+                            <th scope="col">15</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Cifra</th>
+                            <td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Procedura del Metodo delle Divisioni Successive per Base N</h3>
+            <ol class="procedura">
+                <li>Si divide il numero decimale dato per la base N.</li>
+                <li>Si annota il quoziente intero e il resto (sempre compreso tra 0 e N - 1).</li>
+                <li>Si continua a dividere il quoziente ottenuto per N finch&eacute; non si raggiunge un quoziente pari a 0.</li>
+                <li>Il numero nella base N &egrave; dato dalla sequenza dei resti letti dall'ultimo calcolato (cifra pi&ugrave; significativa) fino al primo.</li>
+                <li>Se la base supera 10, i resti dal valore 10 al 15 si scrivono con le lettere A, B, C, D, E, F.</li>
+            </ol>
+
+            <h3>Procedura del Calcolo Posizionale (da Base N a Base 10)</h3>
+            <ol class="procedura">
+                <li>Si scrive il peso di ciascuna posizione: N<sup>0</sup> per la cifra pi&ugrave; a destra, N<sup>1</sup>, N<sup>2</sup> e cos&igrave; via procedendo verso sinistra.</li>
+                <li>Si converte ogni cifra letterale nel suo valore (A = 10, B = 11, &hellip;, F = 15).</li>
+                <li>Si moltiplica ogni cifra per il proprio peso e si sommano tutti i contributi.</li>
+            </ol>
+
+            <div class="esercizio-box">
+                <h4>Esercizio di verifica guidato</h4>
+                <p>Convertire il numero decimale <strong>255<sub>10</sub></strong> in base 16 ed eseguire la riprova posizionale:</p>
+                <div class="esercizio-colonne">
+                    <pre class="esercizio-codice">255 &divide; 16 = 15 (resto 15 = F)
+ 15 &divide; 16 =  0 (resto 15 = F)</pre>
+                    <div class="esercizio-soluzione">
+                        <p><strong>Risultato:</strong> FF<sub>16</sub></p>
+                        <p><strong>Riprova:</strong> 15 &middot; 16 + 15 = 255<sub>10</sub></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <span>Scheda didattica - Sistemi numerici posizionali</span>
+        <span> prof. Michele SALVEMINI</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

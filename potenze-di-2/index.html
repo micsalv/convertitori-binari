@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+    Autore:      prof. Michele SALVEMINI
+    Argomento:   Conversioni tra base 2 e basi potenza di 2 (4, 8, 16, 32)
+    Obiettivo:   Metodo dei raggruppamenti dei bit su valori fino a 32 bit
+    Versione:    1.0
+    Data:        29/09/2026
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convertitore interattivo tra binario e basi potenza di due (4, 8, 16, 32) con raggruppamento dei bit, fino a 32 bit.">
+    <meta name="author" content="prof. Michele SALVEMINI">
+    <title>Convertitore Binario &harr; Base 2<sup>n</sup> (32 bit)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="masthead">
+        <div>
+            <h1>Convertitore Binario &harr; Basi Potenza di 2</h1>
+            <p>Raggruppamento dei bit per passare da base 2 a base 4, 8, 16, 32 &mdash; fino a 32 bit.</p>
+        </div>
+        <button type="button" id="pulsante-stampa" class="print-btn">Stampa PDF</button>
+    </header>
+
+    <main>
+
+        <!-- WIDGET 1: BINARIO -> BASE 2^n -->
+        <section class="widget-card" aria-labelledby="titolo-b2x">
+            <h2 class="widget-title" id="titolo-b2x">
+                <span>1. Da Binario a Base 2<sup>n</sup></span>
+                <span class="widget-suggerimento">Inserisci fino a 32 bit (solo 0 e 1)</span>
+            </h2>
+
+            <div class="input-row">
+                <label for="input-binario">Numero binario:</label>
+                <input type="text" id="input-binario" value="00101101"
+                       inputmode="numeric" autocomplete="off" spellcheck="false"
+                       maxlength="32" placeholder="es. 10110111">
+            </div>
+
+            <div class="input-row">
+                <label for="selettore-base">Base di destinazione:</label>
+                <select id="selettore-base" class="base-select">
+                    <option value="4">Base 4 &mdash; gruppi di 2 bit</option>
+                    <option value="8">Base 8 &mdash; gruppi di 3 bit</option>
+                    <option value="16" selected>Base 16 &mdash; gruppi di 4 bit</option>
+                    <option value="32">Base 32 &mdash; gruppi di 5 bit</option>
+                </select>
+            </div>
+
+            <!-- Contatore caratteri e messaggio di stato -->
+            <p class="input-info" id="info-binario" aria-live="polite"></p>
+
+            <!-- Riga dei bit raggruppati, con etichetta di cifra sotto ogni gruppo -->
+            <div class="gruppi-container" id="gruppi-bit" aria-live="polite"></div>
+
+            <p class="math-box" id="risultato-b2x" aria-live="polite"></p>
+        </section>
+
+        <!-- WIDGET 2: BASE 2^n -> BINARIO -->
+        <section class="widget-card" aria-labelledby="titolo-x2b">
+            <h2 class="widget-title" id="titolo-x2b">
+                <span>2. Da Base 2<sup>n</sup> a Binario</span>
+                <span class="widget-suggerimento">Ogni cifra viene espansa in un gruppo di bit</span>
+            </h2>
+
+            <div class="input-row">
+                <label for="input-cifre">Cifre in base <span id="base-corrente-label">16</span>:</label>
+                <input type="text" id="input-cifre" value="2D"
+                       autocomplete="off" spellcheck="false" maxlength="16">
+            </div>
+
+            <p class="input-info" id="info-cifre" aria-live="polite"></p>
+
+            <div class="table-scroll">
+                <table class="table-divs">
+                    <caption class="visually-hidden">Espansione delle cifre in gruppi di bit</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Cifra</th>
+                            <th scope="col">Valore decimale</th>
+                            <th scope="col">Gruppo di bit (padding a sinistra)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpo-tabella-espansione"></tbody>
+                </table>
+            </div>
+
+            <p class="math-box" id="risultato-x2b" aria-live="polite"></p>
+        </section>
+
+        <!-- SCHEDA RIEPILOGATIVA -->
+        <section class="scheda-stampa" aria-labelledby="titolo-scheda">
+            <div class="scheda-intestazione">
+                <h2 id="titolo-scheda">Report Sintetico &amp; Quadro Teorico</h2>
+                <p>Il metodo dei raggruppamenti dei bit per le basi potenza di 2.</p>
+            </div>
+
+            <div class="callout-box">
+                <strong>Regola generale:</strong><br>
+                Poich&eacute; ogni base 2<sup>n</sup> &egrave; una potenza di 2, ogni cifra
+                di quella base corrisponde esattamente a <strong>n bit</strong>.
+                Basta raggruppare i bit <em>partendo da destra</em> in blocchi di n bit
+                e tradurre ciascun blocco nella cifra corrispondente.
+                Se il numero di bit non &egrave; multiplo di n, si aggiungono
+                <strong>zeri a sinistra</strong>.
+            </div>
+
+            <h3>Tabella dei raggruppamenti</h3>
+            <div class="table-scroll">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Base</th>
+                            <th scope="col">Bit per cifra (n)</th>
+                            <th scope="col">Cifre possibili</th>
+                            <th scope="col">Esempio 45<sub>10</sub></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th scope="row">2</th> <td>1</td> <td>0-1</td>      <td>00101101<sub>2</sub></td></tr>
+                        <tr><th scope="row">4</th> <td>2</td> <td>0-3</td>      <td>0231<sub>4</sub></td></tr>
+                        <tr><th scope="row">8</th> <td>3</td> <td>0-7</td>      <td>055<sub>8</sub></td></tr>
+                        <tr><th scope="row">16</th><td>4</td> <td>0-9, A-F</td> <td>2D<sub>16</sub></td></tr>
+                        <tr><th scope="row">32</th><td>5</td> <td>0-9, A-V</td> <td>1D<sub>32</sub></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Procedura &mdash; Binario &rarr; Base 2<sup>n</sup></h3>
+            <ol class="procedura">
+                <li>Si determina <em>n</em>: numero di bit per cifra (n=4 per l'esadecimale).</li>
+                <li>Si aggiungono zeri a sinistra finch&eacute; il numero di bit &egrave; multiplo di n.</li>
+                <li>Si raggruppano i bit in blocchi di n, partendo da destra.</li>
+                <li>Ogni blocco, letto come numero posizionale, fornisce una cifra della base di arrivo.</li>
+            </ol>
+
+            <h3>Procedura &mdash; Base 2<sup>n</sup> &rarr; Binario</h3>
+            <ol class="procedura">
+                <li>Ogni cifra della base di partenza viene convertita nel suo valore decimale.</li>
+                <li>Ogni valore viene scritto in binario <em>su esattamente n bit</em> (padding a sinistra).</li>
+                <li>Si concatenano i gruppi: il risultato &egrave; il numero binario.</li>
+            </ol>
+
+            <div class="esercizio-box">
+                <h4>Esercizio di verifica guidato</h4>
+                <p>Convertire <strong>10110111<sub>2</sub></strong> in esadecimale e in ottale, poi verificare la riprova.</p>
+                <div class="esercizio-colonne">
+                    <pre class="esercizio-codice">Esadecimale (n=4):
+  1011 0111
+   B    7   → B7₁₆
+
+Ottale (n=3):
+  padding: 010 110 111
+  2   6   7   → 267₈</pre>
+                    <div class="esercizio-soluzione">
+                        <p><strong>Verifica:</strong> 183<sub>10</sub></p>
+                        <p>B7<sub>16</sub> = 11&middot;16 + 7 = 183</p>
+                        <p>267<sub>8</sub> = 2&middot;64 + 6&middot;8 + 7 = 183</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <span>Scheda didattica &mdash; Sistemi numerici posizionali</span>
+        <span>prof. Michele SALVEMINI</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

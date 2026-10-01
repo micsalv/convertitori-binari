@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+    Autore:      prof. Michele SALVEMINI
+    Classe:      ---
+    Argomento:   Sistemi di numerazione - conversioni di base
+    Obiettivo:   Supporto allo studio delle conversioni di base da un sistema
+                 ad un altro (binario <-> decimale)
+    Versione:    2.0
+    Data:        26/09/2026
+    Note:        Revisione HTML5, responsive, con adattamenti per studenti
+                 BES/DSA (caratteri ampliati, target tattili ampi).
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Supporto allo studio delle conversioni di base da un sistema ad un altro: convertitore interattivo binario-decimale con metodo posizionale e divisioni successive.">
+    <meta name="author" content="prof. Michele SALVEMINI">
+    <title>Convertitore ed Eserciziario Binario-Decimale</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Intestazione del documento -->
+    <header class="masthead">
+        <div>
+            <h1>Convertitore Posizionale Binario &harr; Decimale</h1>
+            <p>Strumento didattico interattivo per la notazione posizionale e il metodo delle divisioni successive.</p>
+        </div>
+        <button type="button" id="pulsante-stampa" class="print-btn">Stampa PDF</button>
+    </header>
+
+    <main>
+
+        <!-- WIDGET 1: BINARIO -> DECIMALE -->
+        <section class="widget-card" aria-labelledby="titolo-b2d">
+            <h2 class="widget-title" id="titolo-b2d">
+                <span>1. Conversione da Binario a Decimale (Calcolo Posizionale)</span>
+                <span class="widget-suggerimento">Tocca le caselle dei bit per modificarli</span>
+            </h2>
+
+            <!-- Griglia dei bit: popolata da script.js -->
+            <div class="bit-container" id="griglia-bit"></div>
+
+            <p class="math-box" id="risultato-b2d" aria-live="polite"></p>
+
+            <div class="slider-row">
+                <label for="slider-decimale">Valore decimale:</label>
+                <input type="range" id="slider-decimale" min="0" max="255" value="45">
+                <output class="slider-val" id="display-decimale" for="slider-decimale">45</output>
+            </div>
+        </section>
+
+        <!-- WIDGET 2: DECIMALE -> BINARIO -->
+        <section class="widget-card" aria-labelledby="titolo-d2b">
+            <h2 class="widget-title" id="titolo-d2b">
+                <span>2. Conversione da Decimale a Binario (Divisioni Successive)</span>
+                <span class="widget-suggerimento">Imposta un valore per vedere i passaggi</span>
+            </h2>
+
+            <div class="input-row">
+                <label for="input-decimale">Inserisci numero decimale (0-255):</label>
+                <input type="number" id="input-decimale" min="0" max="255" value="45">
+            </div>
+
+            <div class="division-grid">
+                <div class="table-scroll">
+                    <table class="table-divs">
+                        <caption class="visually-hidden">Tabella dei passaggi delle divisioni successive per due</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Passo</th>
+                                <th scope="col">Divisione (&divide; 2)</th>
+                                <th scope="col">Quoziente</th>
+                                <th scope="col">Resto (Bit)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpo-tabella-divisioni"></tbody>
+                    </table>
+                </div>
+                <div class="arrow-box">
+                    <span class="arrow-label">Lettura resti</span>
+                    <div class="arrow-graphic" aria-hidden="true">&uarr;</div>
+                    <span class="arrow-sublabel">Dal basso (MSB) all'alto (LSB)</span>
+                </div>
+            </div>
+
+            <p class="math-box" id="risultato-d2b" aria-live="polite"></p>
+        </section>
+
+        <!-- SCHEDA RIEPILOGATIVA STAMPABILE -->
+        <section class="scheda-stampa" aria-labelledby="titolo-scheda">
+            <div class="scheda-intestazione">
+                <h2 id="titolo-scheda">Report Sintetico &amp; Quadro Teorico</h2>
+                <p>Riepilogo delle regole di conversione in formato stampabile (PDF).</p>
+            </div>
+
+            <div class="callout-box">
+                <strong>Regola generale di conversione:</strong><br>
+                Nel sistema numerico binario (base 2), ogni cifra (bit) assume un peso
+                posizionale pari a una potenza intera di 2, a partire da 2<sup>0</sup>
+                per il bit meno significativo (LSB) all'estrema destra.
+            </div>
+
+            <h3>Tabella dei Pesi Posizionali a 8 Bit (1 Byte)</h3>
+            <div class="table-scroll">
+                <table class="summary-table">
+                    <caption class="visually-hidden">Pesi posizionali dei bit da 2 alla settima a 2 alla zero</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Potenza</th>
+                            <th scope="col">2<sup>7</sup></th>
+                            <th scope="col">2<sup>6</sup></th>
+                            <th scope="col">2<sup>5</sup></th>
+                            <th scope="col">2<sup>4</sup></th>
+                            <th scope="col">2<sup>3</sup></th>
+                            <th scope="col">2<sup>2</sup></th>
+                            <th scope="col">2<sup>1</sup></th>
+                            <th scope="col">2<sup>0</sup></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Valore decimale</th>
+                            <td>128</td><td>64</td><td>32</td><td>16</td>
+                            <td>8</td><td>4</td><td>2</td><td>1</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Stato esempio (45<sub>10</sub>)</th>
+                            <td>0</td><td>0</td><td>1</td><td>0</td>
+                            <td>1</td><td>1</td><td>0</td><td>1</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Contributo</th>
+                            <td>0</td><td>0</td><td>+32</td><td>0</td>
+                            <td>+8</td><td>+4</td><td>0</td><td>+1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Procedura del Metodo delle Divisioni Successive</h3>
+            <ol class="procedura">
+                <li>Si divide il numero decimale dato per 2.</li>
+                <li>Si annota il quoziente intero e il resto (che sar&agrave; sempre 0 oppure 1).</li>
+                <li>Si continua a dividere il quoziente ottenuto per 2 finch&eacute; non si raggiunge un quoziente pari a 0.</li>
+                <li>Il numero binario corrispondente &egrave; dato dalla sequenza dei resti letti dall'ultimo calcolato (MSB) fino al primo (LSB).</li>
+            </ol>
+
+            <div class="esercizio-box">
+                <h4>Esercizio di verifica guidato</h4>
+                <p>Convertire il numero decimale <strong>77<sub>10</sub></strong> in binario ed eseguire la riprova posizionale:</p>
+                <div class="esercizio-colonne">
+                    <pre class="esercizio-codice">77 &divide; 2 = 38 (resto 1)
+38 &divide; 2 = 19 (resto 0)
+19 &divide; 2 =  9 (resto 1)
+ 9 &divide; 2 =  4 (resto 1)
+ 4 &divide; 2 =  2 (resto 0)
+ 2 &divide; 2 =  1 (resto 0)
+ 1 &divide; 2 =  0 (resto 1)</pre>
+                    <div class="esercizio-soluzione">
+                        <p><strong>Risultato:</strong> 01001101<sub>2</sub></p>
+                        <p><strong>Riprova:</strong> 64 + 8 + 4 + 1 = 77<sub>10</sub></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <span>Scheda didattica - Sistemi numerici posizionali</span>
+        <span> prof. Michele SALVEMINI</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

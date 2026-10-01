@@ -1,0 +1,808 @@
+/*
+    Autore:      prof. Michele SALVEMINI
+    File:        style.css - stile di "Convertitore Base N <-> Base 10"
+    Obiettivo:   Supporto allo studio delle conversioni di base da un sistema ad un altro
+    Versione:    2.0
+    Data:        26/09/2026
+
+    Note di progetto:
+    - Stesso impianto grafico del convertitore binario-decimale, per
+      uniformita' tra i materiali (principio 13 della Knowledge Base).
+    - Dimensioni dei caratteri in rem con base elevata (18px) e target
+      tattili >= 44px, per studenti BES/DSA e uso su tablet/smartphone.
+*/
+
+/* ---------- Variabili di tema ---------- */
+:root {
+    --colore-primario: #1e3a8a;
+    --colore-accento: #2563eb;
+    --colore-testo: #1e293b;
+    --colore-testo-secondario: #475569;
+    --colore-testo-chiaro: #64748b;
+    --colore-bordo: #cbd5e1;
+    --colore-sfondo-pagina: #f1f5f9;
+    --colore-sfondo-card: #ffffff;
+    --colore-sfondo-soft: #f8fafc;
+    --colore-attivo: #eff6ff;
+    --colore-errore: #b91c1c;
+    --colore-sfondo-errore: #fef2f2;
+    --raggio: 12px;
+}
+
+/* ---------- Base ---------- */
+* {
+    box-sizing: border-box;
+}
+
+/* Base tipografica elevata: 1rem = 18px, ben visibile su tablet e smartphone */
+html {
+    font-size: 18px;
+}
+
+body {
+    margin: 0 auto;
+    padding: 24px 16px;
+    max-width: 960px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--colore-testo);
+    background-color: var(--colore-sfondo-pagina);
+}
+
+h1, h2, h3, h4, p, ol {
+    margin-top: 0;
+}
+
+/* Testo solo per screen reader (es. didascalie delle tabelle) */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- Intestazione ---------- */
+.masthead {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: #ffffff;
+    padding: 20px 24px;
+    border-radius: var(--raggio);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.masthead h1 {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.masthead p {
+    margin: 6px 0 0 0;
+    font-size: 0.95rem;
+    opacity: 0.92;
+}
+
+.print-btn {
+    background-color: #ffffff;
+    color: var(--colore-primario);
+    border: none;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    min-height: 44px;   /* target tattile comodo */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.print-btn:hover {
+    background-color: var(--colore-sfondo-soft);
+}
+
+/* ---------- Schede dei widget ---------- */
+.widget-card {
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio);
+    padding: 18px 20px;
+    background: var(--colore-sfondo-card);
+    margin-bottom: 20px;
+}
+
+.widget-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--colore-sfondo-pagina);
+    padding-bottom: 8px;
+}
+
+.widget-suggerimento {
+    font-size: 0.8rem;
+    color: var(--colore-testo-chiaro);
+    font-weight: 400;
+}
+
+/* ---------- Riquadri dei risultati ---------- */
+.math-box {
+    background-color: var(--colore-sfondo-soft);
+    border: 1px dashed var(--colore-bordo);
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+    font-size: 1.1rem;
+    margin: 10px 0;
+}
+
+/* Messaggio di errore sul numero in base N: esplicito e visibile,
+   invece di un risultato silenziosamente sbagliato */
+.math-box.errore {
+    background-color: var(--colore-sfondo-errore);
+    border-color: #fecaca;
+    color: var(--colore-errore);
+    font-weight: 600;
+}
+
+/* ---------- Campi di input ---------- */
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.input-row label {
+    font-weight: 600;
+    color: var(--colore-testo-secondario);
+}
+
+.input-row input {
+    padding: 10px 12px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    min-height: 44px;
+}
+
+/* Campo decimale: larghezza fissa, perche' accetta solo cifre */
+.input-row input[type="number"] {
+    width: 110px;
+}
+
+/* Campo in base N: larghezza maggiore, perche' accetta anche
+   le lettere A-F e numeri piu' lunghi delle cifre decimali */
+.input-row input[type="text"] {
+    width: 200px;
+    font-family: "Courier New", monospace;
+    letter-spacing: 1px;
+}
+
+/* La base corrente ripetuta dentro le etichette dei widget:
+   si aggiorna da script, cosi' l'utente sa sempre in che base sta scrivendo */
+.base-riferimento {
+    font-weight: 800;
+    color: #1d4ed8;
+}
+
+/* ---------- Slider della base con lettura grande ---------- */
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.slider-row label {
+    font-weight: 600;
+    color: var(--colore-testo-secondario);
+}
+
+.slider-row input[type="range"] {
+    flex: 1;
+    min-width: 180px;
+    min-height: 44px;   /* fascia di trascinamento comoda al tocco */
+}
+
+/* Il valore corrente della base e' l'informazione chiave del widget:
+   lo mostriamo grande e in evidenza, subito dopo lo slider */
+.base-display {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    min-width: 52px;
+    text-align: center;
+    background-color: var(--colore-attivo);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
+/* ---------- Legenda delle cifre letterali ---------- */
+.legenda-cifre {
+    background-color: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* Su schermi stretti le tabelle scorrono in orizzontale invece di restringersi */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.division-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+    align-items: stretch;
+}
+
+.table-divs {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.table-divs th {
+    text-align: left;
+    background: var(--colore-sfondo-pagina);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--colore-bordo);
+    color: var(--colore-testo-secondario);
+}
+
+.table-divs td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--colore-sfondo-pagina);
+    text-align: left;
+}
+
+/* Colonna del peso e del prodotto in monospace:
+   allineamento a destra piu' leggibile per i numeri */
+.table-divs td.monospace {
+    font-family: "Courier New", monospace;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* La colonna dello sviluppo posizionale evidenzia i pesi:
+   sono i termini che lo studente deve sommare */
+.table-divs td.peso {
+    color: var(--colore-accento);
+}
+
+.remainder-badge {
+    background-color: var(--colore-accento);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+}
+
+.arrow-box {
+    background: var(--colore-attivo);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.arrow-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--colore-primario);
+    text-transform: uppercase;
+}
+
+.arrow-graphic {
+    font-size: 2rem;
+    color: var(--colore-accento);
+    line-height: 1;
+    margin: 6px 0;
+}
+
+.arrow-sublabel {
+    font-size: 0.8rem;
+    color: var(--colore-testo-secondario);
+    font-weight: 600;
+}
+
+/* ---------- Scheda riepilogativa (anche stampabile) ---------- */
+.scheda-stampa {
+    background: var(--colore-sfondo-card);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio);
+    padding: 20px 24px;
+}
+
+.scheda-intestazione {
+    border-bottom: 2px solid var(--colore-primario);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.scheda-intestazione h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--colore-primario);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.scheda-intestazione p {
+    margin: 4px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--colore-testo-chiaro);
+}
+
+.scheda-stampa h3 {
+    font-size: 1.05rem;
+    margin: 18px 0 8px 0;
+}
+
+.callout-box {
+    background-color: var(--colore-sfondo-soft);
+    border-left: 4px solid #3b82f6;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.95rem;
+}
+
+.summary-table th {
+    background-color: var(--colore-primario);
+    color: #ffffff;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+.summary-table tbody th {
+    background-color: var(--colore-sfondo-pagina);
+    color: var(--colore-testo);
+}
+
+.summary-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+    font-weight: 700;
+}
+
+.procedura {
+    line-height: 1.6;
+    color: #334155;
+    padding-left: 24px;
+}
+
+.procedura li {
+    margin-bottom: 6px;
+}
+
+.esercizio-box {
+    margin-top: 18px;
+    border: 1px dashed var(--colore-bordo);
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.esercizio-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: var(--colore-testo-secondario);
+}
+
+.esercizio-box > p {
+    color: var(--colore-testo-chiaro);
+    margin-bottom: 12px;
+}
+
+.esercizio-colonne {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.esercizio-codice {
+    flex: 1 1 260px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+    overflow-x: auto;
+}
+
+.esercizio-soluzione {
+    flex: 1 1 260px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.esercizio-soluzione p {
+    margin: 4px 0;
+}
+
+/* ---------- Piè di pagina ---------- */
+.page-footer {
+    margin-top: 24px;
+    padding-top: 14px;
+    border-top: 1px solid var(--colore-bordo);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--colore-testo-chiaro);
+}
+
+/* ================================================================
+   ADATTAMENTI PER TABLET (fino a 768px)
+   ================================================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 16px 12px;
+    }
+
+    .masthead h1 {
+        font-size: 1.25rem;
+    }
+
+    /* La tabella delle divisioni e il riquadro "lettura resti"
+       si impilano verticalmente: piu' spazio per i numeri */
+    .division-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arrow-box {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .arrow-graphic {
+        margin: 0;
+    }
+}
+
+/* ================================================================
+   ADATTAMENTI PER SMARTPHONE (fino a 480px)
+   ================================================================ */
+@media (max-width: 480px) {
+    .widget-card,
+    .scheda-stampa {
+        padding: 14px;
+    }
+
+    .widget-title {
+        font-size: 1rem;
+    }
+
+    /* Campi di input a piena larghezza: piu' comodi da compilare */
+    .input-row input[type="number"],
+    .input-row input[type="text"] {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .base-display {
+        width: 100%;
+    }
+}
+
+/* ================================================================
+   STAMPA (PDF A4): grafica fedele allo schermo
+   ================================================================ */
+@page {
+    margin: 16mm;
+}
+
+@media print {
+    /* Base tipografica in punti tipografici, adatta alla stampa */
+    html {
+        font-size: 12pt;
+    }
+
+    body {
+        padding: 0;
+        background: #ffffff;
+        max-width: none;
+    }
+
+    /* Il pulsante di stampa non ha senso sulla copia cartacea */
+    .print-btn {
+        display: none;
+    }
+
+    .masthead,
+    .widget-card,
+    .scheda-stampa {
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .masthead {
+        color: #000000;
+        background: #ffffff;
+        border-bottom: 2px solid var(--colore-primario);
+    }
+
+    .masthead p {
+        color: #333333;
+        opacity: 1;
+    }
+
+    .summary-table th,
+    .remainder-badge {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* La scheda teorica va sempre su una pagina nuova */
+    .scheda-stampa {
+        break-before: page;
+        page-break-before: always;
+        border: none;
+        padding: 0;
+    }
+
+    .page-footer {
+        border-top: none;
+    }
+}
+
+
+/* ---------- Campo di testo binario/cifre ---------- */
+.input-row input[type="text"] {
+    flex: 1 1 220px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 6px;
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--colore-primario);
+    background: #ffffff;
+}
+
+.input-row input[type="text"]:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+    border-color: var(--colore-accento);
+}
+
+/* ---------- Selettore base ---------- */
+.base-select {
+    padding: 10px 12px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--colore-primario);
+    background: #ffffff;
+    min-height: 44px;
+    font-family: inherit;
+}
+
+/* ---------- Riga informativa ---------- */
+.input-info {
+    font-size: 0.85rem;
+    color: var(--colore-testo-chiaro);
+    margin: 4px 0 12px 0;
+    font-weight: 600;
+}
+
+/* ---------- Gruppi di bit ---------- */
+.gruppi-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0;
+    justify-content: center;
+}
+
+.gruppo-bit {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 2px solid var(--colore-accento);
+    border-radius: 8px;
+    background: var(--colore-attivo);
+}
+
+.gruppo-bit-singolo {
+    font-family: "Courier New", monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #94a3b8;
+    padding: 0 2px;
+    letter-spacing: 1px;
+}
+
+.gruppo-bit-singolo.on {
+    color: #1d4ed8;
+}
+
+.gruppo-cifra {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #bfdbfe;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--colore-primario);
+}
+
+/* ---------- Tabella espansione ---------- */
+.bit-group-badge {
+    background-color: var(--colore-attivo);
+    color: var(--colore-primario);
+    font-family: "Courier New", monospace;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 2px;
+}
+
+.padding-nota {
+    font-size: 0.8rem;
+    color: var(--colore-testo-chiaro);
+    font-style: italic;
+}
+
+.cifra-invalida {
+    color: #b91c1c;
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* ---------- Adattamenti mobile ---------- */
+@media (max-width: 480px) {
+    .gruppo-bit {
+        padding: 6px 8px;
+    }
+    .gruppo-cifra {
+        font-size: 1rem;
+    }
+    .input-row input[type="text"] {
+        flex: 1 1 100%;
+        letter-spacing: 1px;
+    }
+}
+
+/* ---------- Stampa ---------- */
+@media print {
+    .gruppo-bit {
+        break-inside: avoid;
+    }
+    .input-row input[type="text"] {
+        border: 1px solid #000;
+    }
+}
+
+
+
+
+
+/* ---------- Selettore della base ---------- */
+.base-select {
+    padding: 10px 12px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--colore-primario);
+    background: #ffffff;
+    min-height: 44px;
+    font-family: inherit;
+}
+
+/* ---------- Gruppi di bit (visualizzazione del raggruppamento) ---------- */
+.gruppi-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0;
+    justify-content: center;
+}
+
+.gruppo-bit {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border: 2px solid var(--colore-accento);
+    border-radius: 8px;
+    background: var(--colore-attivo);
+}
+
+.gruppo-bit-singolo {
+    font-family: "Courier New", monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #94a3b8;
+    padding: 0 2px;
+}
+
+.gruppo-bit-singolo.on {
+    color: #1d4ed8;
+}
+
+.gruppo-cifra {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #bfdbfe;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--colore-primario);
+}
+
+/* ---------- Tabella espansione base -> binario ---------- */
+.bit-group-badge {
+    background-color: var(--colore-attivo);
+    color: var(--colore-primario);
+    font-family: "Courier New", monospace;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.cifra-invalida {
+    color: #b91c1c;
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* ---------- Adattamenti mobile per i gruppi ---------- */
+@media (max-width: 480px) {
+    .gruppo-bit {
+        padding: 6px 8px;
+    }
+    .gruppo-cifra {
+        font-size: 1rem;
+    }
+}
