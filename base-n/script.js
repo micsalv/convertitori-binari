@@ -2,19 +2,25 @@
     Autore:      prof. Michele SALVEMINI
     File:        script.js - comportamento di "Convertitore Base N <-> Base 10"
     Obiettivo:   Supporto allo studio delle conversioni di base da un sistema ad un altro
-    Versione:    2.0
-    Data:        26/09/2026
+    Versione:    3.1 (variante grafica "tabellone sportivo")
+    Data:        08/10/2026
 
     Struttura:
     1. Costanti
     2. Variabili di stato
     3. Funzioni di conversione e rendering
-    4. Funzioni di gestione degli eventi
-    5. Collegamento degli eventi e avvio
+    4. Funzioni di animazione
+    5. Funzioni di gestione degli eventi
+    6. Collegamento degli eventi e avvio
 
     Il convertitore e' bidirezionale e usa un unico stato condiviso:
     modificare un widget aggiorna automaticamente l'altro, come nella
     pagina gemella del convertitore binario-decimale.
+
+    Novita' rispetto alla versione 2.0 (la logica di conversione e' invariata):
+    - Tabellone con il valore decimale e il numero nella base scelta.
+    - Interruttore delle animazioni, pulsante "Numero a caso".
+    - Le costanti seguono lo standard della Knowledge Base (camelCase con prefisso c).
 */
 
 // ---------------------------------------------------------------
@@ -24,15 +30,18 @@
 // Simboli delle cifre: in base 16 i resti dal 10 al 15
 // diventano le lettere A-F, perche' una cifra deve essere
 // sempre un singolo carattere
-const CIFRE = "0123456789ABCDEF";
+const cCifre = "0123456789ABCDEF";
 
 // Intervallo ammissibile per la base di conversione
-const BASE_MINIMA = 2;
-const BASE_MASSIMA = 16;
+const cBaseMinima = 2;
+const cBaseMassima = 16;
 
 // Valore massimo del numero da convertire (8 bit): mantiene
 // la coerenza con il convertitore binario-decimale della stessa serie
-const VALORE_MASSIMO = 255;
+const cValoreMassimo = 255;
+
+// Durata (in millisecondi) dell'effetto "pop" sui risultati
+const cDurataPop = 250;
 
 // ---------------------------------------------------------------
 // 2. Variabili di stato
@@ -43,6 +52,15 @@ const VALORE_MASSIMO = 255;
 let numeroDecimale = 45;
 let baseDestinazione = 2;
 let stringaBaseN = "101101";   // e' il numero 45 scritto in base 2
+
+// true se le animazioni sono attive (interruttore + preferenza del sistema)
+let animazioniAttive = true;
+
+// true solo quando il numero cambia dal campo o dal dado: in quel caso le righe
+// della tabella compaiono in sequenza (con lo slider della base sarebbe un effetto
+// continuo e fastidioso). Ogni tabella usa e azzera il proprio indicatore.
+let animaPosizionale = false;
+let animaDivisioni = false;
 
 // ---------------------------------------------------------------
 // 3. Funzioni di conversione e rendering
@@ -62,7 +80,7 @@ function convertiInBaseN(numero, base) {
 
     while (daDividere > 0) {
         const resto = daDividere % base;
-        resti.push(CIFRE[resto]);
+        resti.push(cCifre[resto]);
         daDividere = Math.floor(daDividere / base);
     }
 
@@ -89,7 +107,7 @@ function calcolaDecimaleDaBaseN(stringa, base) {
         const cifra = pulita[i];
         const posizioneDaDestra = pulita.length - 1 - i;
         const peso = Math.pow(base, posizioneDaDestra);
-        const valoreCifra = CIFRE.indexOf(cifra);
+        const valoreCifra = cCifre.indexOf(cifra);
 
         // La cifra non appartiene all'alfabeto della base:
         // la conversione non e' possibile, segnaliamo l'errore
@@ -120,6 +138,10 @@ function aggiornaCalcoloPosizionale() {
     const risultato = document.getElementById("risultato-n2d");
     corpoTabella.innerHTML = "";
 
+    // Le righe si animano solo se richiesto E se le animazioni sono attive
+    const animaOra = animaPosizionale && animazioniAttive;
+    animaPosizionale = false;
+
     const conversione = calcolaDecimaleDaBaseN(stringaBaseN, baseDestinazione);
 
     // Errore: cifra non valida per la base corrente.
@@ -149,6 +171,12 @@ function aggiornaCalcoloPosizionale() {
             riga.posizione + "</sup> = " + riga.peso + "</td>" +
             '<td class="monospace">' + riga.valoreCifra + " &times; " +
             riga.peso + " = " + riga.contributo + "</td>";
+
+        // Ritardo crescente: le righe compaiono nell'ordine delle cifre
+        if (animaOra) {
+            tr.className = "riga-nuova";
+            tr.style.setProperty("--i", i);
+        }
         corpoTabella.appendChild(tr);
     }
 
@@ -168,6 +196,10 @@ function aggiornaDivisioniSuccessive() {
     const corpoTabella = document.getElementById("corpo-tabella-divisioni");
     corpoTabella.innerHTML = "";
 
+    // Le righe si animano solo se richiesto E se le animazioni sono attive
+    const animaOra = animaDivisioni && animazioniAttive;
+    animaDivisioni = false;
+
     // L'intestazione della tabella ricorda sempre la base in uso:
     // evita confusione quando lo studente muove lo slider
     document.getElementById("intestazione-divisione").innerHTML =
@@ -178,6 +210,10 @@ function aggiornaDivisioniSuccessive() {
         corpoTabella.innerHTML =
             "<tr><td>1</td><td>0 &divide; " + baseDestinazione + "</td><td>0</td>" +
             "<td><span class=\"remainder-badge\">0</span></td></tr>";
+        if (animaOra) {
+            corpoTabella.firstElementChild.className = "riga-nuova";
+            corpoTabella.firstElementChild.style.setProperty("--i", 0);
+        }
         document.getElementById("risultato-d2n").innerHTML =
             "<strong>0<sub>10</sub></strong> = <strong>0<sub>" +
             baseDestinazione + "</sub></strong>";
@@ -192,14 +228,20 @@ function aggiornaDivisioniSuccessive() {
         const quoziente = Math.floor(daDividere / baseDestinazione);
         const resto = daDividere % baseDestinazione;
 
-        resti.push(CIFRE[resto]);
+        resti.push(cCifre[resto]);
 
         const riga = document.createElement("tr");
         riga.innerHTML =
             "<td>" + passo + "</td>" +
             "<td>" + daDividere + " &divide; " + baseDestinazione + "</td>" +
             "<td>" + quoziente + "</td>" +
-            '<td><span class="remainder-badge">' + CIFRE[resto] + "</span></td>";
+            '<td><span class="remainder-badge">' + cCifre[resto] + "</span></td>";
+
+        // Ritardo crescente: le righe compaiono nell'ordine dei calcoli
+        if (animaOra) {
+            riga.className = "riga-nuova";
+            riga.style.setProperty("--i", passo - 1);
+        }
         corpoTabella.appendChild(riga);
 
         daDividere = quoziente;
@@ -212,6 +254,35 @@ function aggiornaDivisioniSuccessive() {
     document.getElementById("risultato-d2n").innerHTML =
         "<strong>" + numeroDecimale + "<sub>10</sub></strong> = <strong>" +
         risultato + "<sub>" + baseDestinazione + "</sub></strong>";
+
+    // La freccia "Lettura resti" scorre verso l'alto: indica il verso di lettura
+    if (animaOra) {
+        animaFrecciaLettura();
+    }
+}
+
+// Aggiorna il tabellone: valore decimale e numero nella base scelta.
+// Le cifre diverse da zero hanno una classe dedicata (colore) ma restano
+// sempre scritte: il colore non e' l'unica informazione.
+// Il numero mostrato e' sempre la conversione valida del valore decimale
+// corrente, anche mentre nel campo in base N c'e' una cifra non ammissibile.
+function aggiornaTabellone() {
+    document.getElementById("tabellone-decimale").textContent = numeroDecimale;
+    document.getElementById("etichetta-tabellone-base").textContent =
+        "Base " + baseDestinazione;
+    document.getElementById("descrizione-tabellone-base").textContent =
+        "cifre da 0 a " + cCifre[baseDestinazione - 1];
+
+    const numeroInBaseN = convertiInBaseN(numeroDecimale, baseDestinazione);
+    const tabelloneBaseN = document.getElementById("tabellone-base-n");
+    tabelloneBaseN.innerHTML = "";
+
+    for (let i = 0; i < numeroInBaseN.length; i++) {
+        const cifra = document.createElement("span");
+        cifra.className = numeroInBaseN[i] === "0" ? "zero" : "attiva";
+        cifra.textContent = numeroInBaseN[i];
+        tabelloneBaseN.appendChild(cifra);
+    }
 }
 
 // Aggiorna tutti gli elementi condivisi: lettura della base nelle
@@ -243,12 +314,58 @@ function aggiornaElementiCondivisi() {
 // garantendo che i due widget mostrino sempre lo stesso numero
 function aggiornaTutto() {
     aggiornaElementiCondivisi();
+    aggiornaTabellone();
     aggiornaCalcoloPosizionale();
     aggiornaDivisioniSuccessive();
 }
 
 // ---------------------------------------------------------------
-// 4. Funzioni di gestione degli eventi
+// 4. Funzioni di animazione
+// ---------------------------------------------------------------
+
+// Piccolo "pop" (ingrandimento e ritorno) su un elemento.
+// Non fa nulla se l'utente ha disattivato le animazioni.
+function animaPop(elemento) {
+    if (!animazioniAttive) {
+        return;
+    }
+    elemento.animate(
+        [
+            { transform: "scale(1)" },
+            { transform: "scale(1.06)" },
+            { transform: "scale(1)" }
+        ],
+        { duration: cDurataPop, easing: "ease-out" }
+    );
+}
+
+// Effetto "pop" sui due numeri del tabellone
+function animaTabellone() {
+    animaPop(document.getElementById("tabellone-decimale"));
+    animaPop(document.getElementById("tabellone-base-n"));
+}
+
+// La freccia parte dal basso e sale: ricorda che i resti si leggono dal basso verso l'alto
+function animaFrecciaLettura() {
+    document.getElementById("icona-freccia").animate(
+        [
+            { transform: "translateY(14px)", opacity: 0 },
+            { transform: "translateY(0)", opacity: 1 }
+        ],
+        { duration: 450, easing: "ease-out" }
+    );
+}
+
+// Attiva o disattiva le animazioni: l'attributo su <html> viene letto dal CSS
+function impostaAnimazioni(attive) {
+    animazioniAttive = attive;
+    document.documentElement.setAttribute("data-animazioni", attive ? "on" : "off");
+    document.getElementById("pulsante-animazioni").setAttribute("aria-checked", attive ? "true" : "false");
+    document.getElementById("stato-animazioni").textContent = attive ? "sì" : "no";
+}
+
+// ---------------------------------------------------------------
+// 5. Funzioni di gestione degli eventi
 // ---------------------------------------------------------------
 
 // Campo in base N: se la stringa e' valida aggiorna lo stato
@@ -263,7 +380,9 @@ function gestisciInputBaseN(valore) {
         document.getElementById("input-decimale").value = numeroDecimale;
         stringaBaseN = conversione.pulita;   // forma canonica
     }
+    animaPosizionale = true;
     aggiornaTutto();
+    animaTabellone();
 }
 
 // Campo decimale: il valore viene limitato all'intervallo 0-255,
@@ -273,12 +392,14 @@ function gestisciInputDecimale(valore) {
     if (isNaN(numero) || numero < 0) {
         numero = 0;
     }
-    if (numero > VALORE_MASSIMO) {
-        numero = VALORE_MASSIMO;
+    if (numero > cValoreMassimo) {
+        numero = cValoreMassimo;
     }
     numeroDecimale = numero;
     stringaBaseN = convertiInBaseN(numeroDecimale, baseDestinazione);
+    animaDivisioni = true;
     aggiornaTutto();
+    animaTabellone();
 }
 
 // Lo slider vincola la base all'intervallo [2, 16] per costruzione,
@@ -288,15 +409,27 @@ function gestisciInputDecimale(valore) {
 function gestisciSlider(valore) {
     let base = parseInt(valore, 10);
     if (isNaN(base)) {
-        base = BASE_MINIMA;
+        base = cBaseMinima;
     }
     baseDestinazione = base;
     stringaBaseN = convertiInBaseN(numeroDecimale, baseDestinazione);
     aggiornaTutto();
 }
 
+// Estrae un intero casuale tra 0 e 255: Math.random() restituisce un reale
+// in [0, 1), moltiplicato per 256 e troncato da' un intero da 0 a 255
+function estraiNumeroCasuale() {
+    numeroDecimale = Math.floor(Math.random() * (cValoreMassimo + 1));
+    stringaBaseN = convertiInBaseN(numeroDecimale, baseDestinazione);
+    document.getElementById("input-decimale").value = numeroDecimale;
+    animaDivisioni = true;
+    animaPosizionale = true;
+    aggiornaTutto();
+    animaTabellone();
+}
+
 // ---------------------------------------------------------------
-// 5. Collegamento degli eventi e avvio
+// 6. Collegamento degli eventi e avvio
 // ---------------------------------------------------------------
 
 document.getElementById("input-base-n").addEventListener("input", function () {
@@ -311,9 +444,20 @@ document.getElementById("slider-base").addEventListener("input", function () {
     gestisciSlider(this.value);
 });
 
+document.getElementById("pulsante-casuale").addEventListener("click", estraiNumeroCasuale);
+
 document.getElementById("pulsante-stampa").addEventListener("click", function () {
     window.print();
 });
+
+document.getElementById("pulsante-animazioni").addEventListener("click", function () {
+    impostaAnimazioni(!animazioniAttive);
+});
+
+// Avvio: se il sistema dell'utente chiede meno movimento, le animazioni partono spente
+// (l'utente puo' comunque riattivarle con l'interruttore)
+const preferisceMenoMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+impostaAnimazioni(!preferisceMenoMovimento);
 
 // Primo rendering: mostra subito la conversione del valore iniziale
 aggiornaTutto();

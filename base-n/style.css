@@ -1,32 +1,82 @@
 /*
     Autore:      prof. Michele SALVEMINI
     File:        style.css - stile di "Convertitore Base N <-> Base 10"
+                 (variante grafica "tabellone sportivo")
     Obiettivo:   Supporto allo studio delle conversioni di base da un sistema ad un altro
-    Versione:    2.0
-    Data:        26/09/2026
+    Versione:    3.1
+    Data:        08/10/2026
 
     Note di progetto:
-    - Stesso impianto grafico del convertitore binario-decimale, per
+    - Stesso impianto grafico del convertitore binario-decimale (variante 3.1), per
       uniformita' tra i materiali (principio 13 della Knowledge Base).
-    - Dimensioni dei caratteri in rem con base elevata (18px) e target
-      tattili >= 44px, per studenti BES/DSA e uso su tablet/smartphone.
+    - Il tabellone mostra il valore decimale e il numero nella base scelta; e' scuro
+      sia nel tema chiaro sia in quello scuro. Le cifre diverse da zero sono
+      evidenziate dal colore, ma restano sempre scritte.
+    - Un solo accento (verde) piu' il colore semantico dell'errore. Raggi: --raggio per
+      schede e riquadri, --raggio-piccolo per controlli, forma a pillola solo per
+      etichette e badge.
+    - Accessibilita' BES/DSA: base 18px, interlinea 1.6, testo a sinistra, nessun
+      maiuscolo o corsivo, contrasto elevato, target >= 48px.
+    - Tema chiaro/scuro automatico (prefers-color-scheme). In stampa: sempre chiaro.
+    - Le animazioni si spengono con html[data-animazioni="off"], impostato da script.js.
 */
 
-/* ---------- Variabili di tema ---------- */
+/* ---------- Variabili di tema (chiaro) ---------- */
 :root {
-    --colore-primario: #1e3a8a;
-    --colore-accento: #2563eb;
-    --colore-testo: #1e293b;
-    --colore-testo-secondario: #475569;
-    --colore-testo-chiaro: #64748b;
-    --colore-bordo: #cbd5e1;
-    --colore-sfondo-pagina: #f1f5f9;
+    --colore-sfondo-pagina: #eef1f7;
     --colore-sfondo-card: #ffffff;
-    --colore-sfondo-soft: #f8fafc;
-    --colore-attivo: #eff6ff;
+    --colore-sfondo-soft: #f4f6fb;
+    --colore-testo: #0f1830;
+    --colore-testo-secondario: #4a5672;
+    --colore-bordo: #d3d9e6;
+    --colore-accento: #0b7a3e;             /* unico accento */
+    --colore-accento-testo: #ffffff;       /* testo su sfondo accento */
+    --colore-attivo: #e3f6ea;              /* tinta chiara dell'accento */
+    --colore-tasto-spento: #e6eaf3;
+    --colore-titolo: #0b1530;
+    --colore-focus: #1d4ed8;
+    --colore-primario: #0b1530;            /* intestazioni di tabella (pesi) */
     --colore-errore: #b91c1c;
     --colore-sfondo-errore: #fef2f2;
-    --raggio: 12px;
+    --colore-bordo-errore: #fecaca;
+
+    /* Tabellone (scuro in entrambi i temi) */
+    --tabellone-sfondo: #0b1530;
+    --tabellone-testo: #ffffff;
+    --tabellone-secondario: #aab6d6;
+    --tabellone-uno: #b8f23a;
+    --tabellone-zero: #9aa7cc;
+    --tabellone-bordo: #24304f;
+
+    --raggio: 18px;
+    --raggio-piccolo: 12px;
+    --ombra: 0 1px 2px rgba(15, 24, 48, 0.06), 0 8px 24px rgba(15, 24, 48, 0.07);
+}
+
+/* ---------- Tema scuro (solo a schermo: la stampa resta chiara) ---------- */
+@media screen and (prefers-color-scheme: dark) {
+    :root {
+        --colore-sfondo-pagina: #060a16;
+        --colore-sfondo-card: #101933;
+        --colore-sfondo-soft: #0c1429;
+        --colore-testo: #eef2ff;
+        --colore-testo-secondario: #a3afcc;
+        --colore-bordo: #24304f;
+        --colore-accento: #b8f23a;
+        --colore-accento-testo: #0a1200;
+        --colore-attivo: #1a2c1c;
+        --colore-tasto-spento: #1a2442;
+        --colore-titolo: #b8f23a;
+        --colore-focus: #ffd84d;
+        --colore-primario: #1a2442;
+        --colore-errore: #fecaca;
+        --colore-sfondo-errore: #3a1419;
+        --colore-bordo-errore: #7f1d1d;
+
+        --tabellone-sfondo: #101a38;
+        --tabellone-bordo: #2b3963;
+        --ombra: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
 }
 
 /* ---------- Base ---------- */
@@ -34,7 +84,7 @@
     box-sizing: border-box;
 }
 
-/* Base tipografica elevata: 1rem = 18px, ben visibile su tablet e smartphone */
+/* Base tipografica elevata: 1rem = 18px */
 html {
     font-size: 18px;
 }
@@ -45,7 +95,8 @@ body {
     max-width: 960px;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 1rem;
-    line-height: 1.55;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
     color: var(--colore-testo);
     background-color: var(--colore-sfondo-pagina);
 }
@@ -54,7 +105,7 @@ h1, h2, h3, h4, p, ol {
     margin-top: 0;
 }
 
-/* Testo solo per screen reader (es. didascalie delle tabelle) */
+/* Testo solo per screen reader (didascalie delle tabelle, set di icone) */
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -64,13 +115,80 @@ h1, h2, h3, h4, p, ol {
     white-space: nowrap;
 }
 
-/* ---------- Intestazione ---------- */
+/* ---------- Icone ---------- */
+.icona {
+    width: 1.3em;
+    height: 1.3em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Pulsanti ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;                 /* target tattile comodo */
+    padding: 0 18px;
+    border: 2px solid transparent;
+    border-radius: var(--raggio-piccolo);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:focus-visible,
+.bit-box:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--colore-focus);
+    outline-offset: 3px;
+}
+
+/* Azione principale (Stampa PDF) */
+.btn-pieno {
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
+}
+
+.btn-pieno:hover {
+    filter: brightness(1.08);
+}
+
+/* Azioni secondarie */
+.btn-contorno {
+    background-color: transparent;
+    color: var(--colore-accento);
+    border-color: var(--colore-accento);
+}
+
+.btn-contorno:hover {
+    background-color: var(--colore-attivo);
+}
+
+/* Stato dell'interruttore: testo (sì/no), non solo colore. Forma a pillola. */
+.stato {
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
+    border-radius: 999px;
+    padding: 0 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+/* ---------- Intestazione (barra dell'app) ---------- */
 .masthead {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-    color: #ffffff;
-    padding: 20px 24px;
-    border-radius: var(--raggio);
-    margin-bottom: 20px;
+    padding: 4px 4px 18px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -80,83 +198,190 @@ h1, h2, h3, h4, p, ol {
 
 .masthead h1 {
     margin: 0;
-    font-size: 1.45rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
+    line-height: 1.25;
+    color: var(--colore-titolo);
 }
 
 .masthead p {
     margin: 6px 0 0 0;
+    max-width: 52ch;
     font-size: 0.95rem;
-    opacity: 0.92;
+    color: var(--colore-testo-secondario);
 }
 
-.print-btn {
-    background-color: #ffffff;
-    color: var(--colore-primario);
-    border: none;
-    padding: 12px 20px;
-    font-size: 0.95rem;
+.masthead-azioni {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Tabellone (elemento caratteristico) ---------- */
+.tabellone {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    background-color: var(--tabellone-sfondo);
+    color: var(--tabellone-testo);
+    border: 1px solid var(--tabellone-bordo);
+    border-radius: var(--raggio);
+    box-shadow: var(--ombra);
+}
+
+.tabellone-pannello {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.tabellone-etichetta {
+    font-size: 1rem;
     font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    min-height: 44px;   /* target tattile comodo */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    color: var(--tabellone-testo);
 }
 
-.print-btn:hover {
-    background-color: var(--colore-sfondo-soft);
+.tabellone-base {
+    font-size: 0.85rem;
+    color: var(--tabellone-secondario);
+}
+
+.tabellone-valore {
+    display: inline-block;             /* necessario per l'animazione di scala */
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabellone-basen {
+    font-size: 2.6rem;
+    letter-spacing: 0.08em;
+    max-width: 100%;
+    overflow-wrap: anywhere;          /* numeri lunghi (base 2 oltre 8 cifre) vanno a capo */
+}
+
+/* Cifre del numero in base N: quelle diverse da zero sono evidenziate,
+   lo zero e' attenuato (ma sempre leggibile) */
+.tabellone-basen .attiva {
+    color: var(--tabellone-uno);
+}
+
+.tabellone-basen .zero {
+    color: var(--tabellone-zero);
+}
+
+/* Unico momento d'ingresso della pagina: i due pannelli del tabellone scendono in sequenza */
+@keyframes tabellone-entra {
+    from {
+        opacity: 0;
+        transform: translateY(-14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tabellone-pannello {
+    animation: tabellone-entra 0.5s ease-out both;
+}
+
+.tabellone-pannello:last-child {
+    animation-delay: 0.12s;
+}
+
+.tabellone-uguale {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--tabellone-secondario);
 }
 
 /* ---------- Schede dei widget ---------- */
 .widget-card {
     border: 1px solid var(--colore-bordo);
     border-radius: var(--raggio);
-    padding: 18px 20px;
+    padding: 22px 24px;
     background: var(--colore-sfondo-card);
-    margin-bottom: 20px;
+    box-shadow: var(--ombra);
+    margin-bottom: 22px;
 }
 
 .widget-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--colore-sfondo-pagina);
-    padding-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--colore-bordo);
 }
 
+/* Suggerimento: etichetta a pillola, come i filtri delle app */
 .widget-suggerimento {
-    font-size: 0.8rem;
-    color: var(--colore-testo-chiaro);
-    font-weight: 400;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--colore-testo-secondario);
+    background-color: var(--colore-sfondo-soft);
+    border: 1px solid var(--colore-bordo);
+    border-radius: 999px;
+    padding: 2px 12px;
 }
 
-/* ---------- Riquadri dei risultati ---------- */
+/* ---------- Riquadri dei risultati (sviluppo del calcolo) ---------- */
 .math-box {
     background-color: var(--colore-sfondo-soft);
-    border: 1px dashed var(--colore-bordo);
-    border-radius: 8px;
-    padding: 12px 14px;
-    text-align: center;
+    border: 1px solid var(--colore-bordo);
+    border-left: 5px solid var(--colore-accento);
+    border-radius: var(--raggio-piccolo);
+    padding: 14px 16px;
     font-size: 1.1rem;
-    margin: 10px 0;
+    margin: 12px 0;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
 }
 
-/* Messaggio di errore sul numero in base N: esplicito e visibile,
-   invece di un risultato silenziosamente sbagliato */
-.math-box.errore {
-    background-color: var(--colore-sfondo-errore);
-    border-color: #fecaca;
-    color: var(--colore-errore);
+/* ---------- Slider ---------- */
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.slider-row label,
+.input-row label {
     font-weight: 600;
+    color: var(--colore-testo-secondario);
 }
 
-/* ---------- Campi di input ---------- */
+.slider-row input[type="range"] {
+    flex: 1;
+    min-width: 180px;
+    min-height: 48px;                  /* fascia di trascinamento comoda al tocco */
+    accent-color: var(--colore-accento);
+}
+
+.slider-val {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--colore-accento);
+    min-width: 3ch;
+    text-align: center;
+}
+
+/* ---------- Widget 2: input e tabella delle divisioni ---------- */
 .input-row {
     display: flex;
     align-items: center;
@@ -165,87 +390,20 @@ h1, h2, h3, h4, p, ol {
     flex-wrap: wrap;
 }
 
-.input-row label {
-    font-weight: 600;
-    color: var(--colore-testo-secondario);
-}
-
 .input-row input {
-    padding: 10px 12px;
-    border: 1px solid var(--colore-bordo);
-    border-radius: 6px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    min-height: 44px;
-}
-
-/* Campo decimale: larghezza fissa, perche' accetta solo cifre */
-.input-row input[type="number"] {
     width: 110px;
-}
-
-/* Campo in base N: larghezza maggiore, perche' accetta anche
-   le lettere A-F e numeri piu' lunghi delle cifre decimali */
-.input-row input[type="text"] {
-    width: 200px;
-    font-family: "Courier New", monospace;
-    letter-spacing: 1px;
-}
-
-/* La base corrente ripetuta dentro le etichette dei widget:
-   si aggiorna da script, cosi' l'utente sa sempre in che base sta scrivendo */
-.base-riferimento {
+    padding: 10px 12px;
+    border: 2px solid var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
+    background-color: var(--colore-sfondo-soft);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.1rem;
     font-weight: 800;
-    color: #1d4ed8;
+    color: var(--colore-testo);
+    min-height: 48px;
 }
 
-/* ---------- Slider della base con lettura grande ---------- */
-.slider-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-}
-
-.slider-row label {
-    font-weight: 600;
-    color: var(--colore-testo-secondario);
-}
-
-.slider-row input[type="range"] {
-    flex: 1;
-    min-width: 180px;
-    min-height: 44px;   /* fascia di trascinamento comoda al tocco */
-}
-
-/* Il valore corrente della base e' l'informazione chiave del widget:
-   lo mostriamo grande e in evidenza, subito dopo lo slider */
-.base-display {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #1d4ed8;
-    min-width: 52px;
-    text-align: center;
-    background-color: var(--colore-attivo);
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    padding: 4px 10px;
-}
-
-/* ---------- Legenda delle cifre letterali ---------- */
-.legenda-cifre {
-    background-color: #fffbeb;
-    border-left: 4px solid #f59e0b;
-    border-radius: 0 8px 8px 0;
-    padding: 12px 14px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 0;
-}
-
-/* Su schermi stretti le tabelle scorrono in orizzontale invece di restringersi */
+/* Su schermi stretti la tabella scorre in orizzontale invece di restringersi */
 .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -254,35 +412,166 @@ h1, h2, h3, h4, p, ol {
 .division-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 14px;
+    gap: 16px;
     margin-top: 8px;
     align-items: stretch;
 }
 
+/* Tabella in stile "statistiche": intestazione tenue, righe a fasce alternate */
 .table-divs {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .table-divs th {
     text-align: left;
-    background: var(--colore-sfondo-pagina);
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--colore-bordo);
+    background: var(--colore-sfondo-soft);
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--colore-bordo);
     color: var(--colore-testo-secondario);
 }
 
 .table-divs td {
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--colore-sfondo-pagina);
-    text-align: left;
+    padding: 10px 12px;
 }
 
-/* Colonna del peso e del prodotto in monospace:
+.table-divs tbody tr:nth-child(even) {
+    background-color: var(--colore-sfondo-soft);
+}
+
+.remainder-badge {
+    display: inline-block;
+    min-width: 2.2ch;
+    text-align: center;
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-weight: 800;
+    padding: 2px 12px;
+    border-radius: 999px;
+}
+
+/* Le righe della tabella compaiono in sequenza (solo quando il numero cambia dal campo) */
+@keyframes riga-sale {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.riga-nuova {
+    animation: riga-sale 0.35s ease-out both;
+    animation-delay: calc(var(--i) * 60ms);
+}
+
+.arrow-box {
+    background: var(--colore-sfondo-soft);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.arrow-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--colore-testo);
+}
+
+.icona-freccia {
+    width: 2.6rem;
+    height: 2.6rem;
+    color: var(--colore-accento);
+    stroke-width: 2.5;
+}
+
+.arrow-sublabel {
+    font-size: 0.85rem;
+    color: var(--colore-testo-secondario);
+    font-weight: 600;
+}
+
+/* ---------- Campi di input ---------- */
+.input-row input[type="number"] {
+    width: 110px;                      /* il campo decimale accetta solo cifre */
+}
+
+/* Campo in base N: piu' largo, perche' accetta anche le lettere A-F
+   e numeri piu' lunghi delle cifre decimali */
+.input-row input[type="text"] {
+    width: 200px;
+    letter-spacing: 1px;
+}
+
+/* La base corrente ripetuta dentro le etichette dei widget:
+   si aggiorna da script, cosi' l'utente sa sempre in che base sta scrivendo */
+.base-riferimento {
+    font-weight: 800;
+    color: var(--colore-accento);
+}
+
+/* ---------- Slider della base con lettura grande ---------- */
+/* Il valore corrente della base e' l'informazione chiave del widget:
+   lo mostriamo grande e in evidenza, subito dopo lo slider */
+.base-display {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--colore-accento);
+    min-width: 3.2ch;
+    text-align: center;
+    background-color: var(--colore-attivo);
+    border: 2px solid var(--colore-accento);
+    border-radius: var(--raggio-piccolo);
+    padding: 4px 14px;
+}
+
+/* ---------- Legenda delle cifre letterali ---------- */
+.legenda-cifre {
+    background-color: var(--colore-sfondo-soft);
+    border-left: 5px solid var(--colore-accento);
+    border-radius: 0 var(--raggio-piccolo) var(--raggio-piccolo) 0;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    margin: 4px 0 0 0;
+}
+
+.legenda-cifre .icona {
+    color: var(--colore-accento);
+    vertical-align: -0.25em;
+    margin-right: 4px;
+}
+
+/* Il bordo e il testo mantengono l'attributo hidden anche con display esplicito */
+.legenda-cifre[hidden] {
+    display: none;
+}
+
+/* Messaggio di errore sul numero in base N: esplicito e visibile,
+   invece di un risultato silenziosamente sbagliato */
+.math-box.errore {
+    background-color: var(--colore-sfondo-errore);
+    border-color: var(--colore-bordo-errore);
+    border-left-color: var(--colore-errore);
+    color: var(--colore-errore);
+    font-weight: 600;
+}
+
+/* Colonne dei pesi e dei prodotti in monospace:
    allineamento a destra piu' leggibile per i numeri */
 .table-divs td.monospace {
-    font-family: "Courier New", monospace;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
     font-weight: 700;
     text-align: right;
 }
@@ -293,86 +582,57 @@ h1, h2, h3, h4, p, ol {
     color: var(--colore-accento);
 }
 
-.remainder-badge {
-    background-color: var(--colore-accento);
-    color: #ffffff;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 4px;
-}
-
-.arrow-box {
-    background: var(--colore-attivo);
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.arrow-label {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--colore-primario);
-    text-transform: uppercase;
-}
-
-.arrow-graphic {
-    font-size: 2rem;
-    color: var(--colore-accento);
-    line-height: 1;
-    margin: 6px 0;
-}
-
-.arrow-sublabel {
-    font-size: 0.8rem;
-    color: var(--colore-testo-secondario);
-    font-weight: 600;
-}
-
 /* ---------- Scheda riepilogativa (anche stampabile) ---------- */
 .scheda-stampa {
     background: var(--colore-sfondo-card);
     border: 1px solid var(--colore-bordo);
     border-radius: var(--raggio);
-    padding: 20px 24px;
+    box-shadow: var(--ombra);
+    padding: 22px 26px;
 }
 
 .scheda-intestazione {
-    border-bottom: 2px solid var(--colore-primario);
+    border-bottom: 3px solid var(--colore-accento);
     padding-bottom: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .scheda-intestazione h2 {
     margin: 0;
-    font-size: 1.25rem;
-    color: var(--colore-primario);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 1.3rem;
+    color: var(--colore-titolo);
 }
 
 .scheda-intestazione p {
     margin: 4px 0 0 0;
     font-size: 0.9rem;
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
 }
 
 .scheda-stampa h3 {
     font-size: 1.05rem;
-    margin: 18px 0 8px 0;
+    margin: 20px 0 8px 0;
 }
 
 .callout-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
     background-color: var(--colore-sfondo-soft);
-    border-left: 4px solid #3b82f6;
+    border-left: 5px solid var(--colore-accento);
     padding: 14px 16px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--raggio-piccolo) var(--raggio-piccolo) 0;
     margin: 12px 0;
-    line-height: 1.5;
+}
+
+.callout-box .icona {
+    color: var(--colore-accento);
+    margin-top: 0.15em;
+}
+
+.callout-box p {
+    margin: 0;
+    max-width: 68ch;
 }
 
 .summary-table {
@@ -380,30 +640,31 @@ h1, h2, h3, h4, p, ol {
     border-collapse: collapse;
     margin: 10px 0;
     font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .summary-table th {
     background-color: var(--colore-primario);
     color: #ffffff;
-    padding: 8px 10px;
+    padding: 10px 12px;
     text-align: center;
 }
 
 .summary-table tbody th {
-    background-color: var(--colore-sfondo-pagina);
+    background-color: var(--colore-sfondo-soft);
     color: var(--colore-testo);
 }
 
 .summary-table td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--colore-bordo);
     text-align: center;
     font-weight: 700;
 }
 
 .procedura {
-    line-height: 1.6;
-    color: #334155;
+    line-height: 1.7;
+    max-width: 68ch;
     padding-left: 24px;
 }
 
@@ -412,21 +673,20 @@ h1, h2, h3, h4, p, ol {
 }
 
 .esercizio-box {
-    margin-top: 18px;
-    border: 1px dashed var(--colore-bordo);
-    border-radius: 8px;
+    margin-top: 20px;
+    border: 2px dashed var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
     padding: 16px;
-    background: #fafafa;
+    background: var(--colore-sfondo-soft);
 }
 
 .esercizio-box h4 {
     margin: 0 0 8px 0;
-    font-size: 0.95rem;
-    color: var(--colore-testo-secondario);
+    font-size: 1rem;
 }
 
 .esercizio-box > p {
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
     margin-bottom: 12px;
 }
 
@@ -438,30 +698,38 @@ h1, h2, h3, h4, p, ol {
 
 .esercizio-codice {
     flex: 1 1 260px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--colore-sfondo-card);
+    border: 1px solid var(--colore-bordo);
     padding: 12px;
-    border-radius: 4px;
-    font-family: "Courier New", monospace;
+    border-radius: var(--raggio-piccolo);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0;
     overflow-x: auto;
 }
 
 .esercizio-soluzione {
     flex: 1 1 260px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--colore-sfondo-card);
+    border: 1px solid var(--colore-bordo);
     padding: 12px;
-    border-radius: 4px;
+    border-radius: var(--raggio-piccolo);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .esercizio-soluzione p {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
     margin: 4px 0;
+}
+
+.esercizio-soluzione .icona {
+    color: var(--colore-accento);
+    align-self: center;
 }
 
 /* ---------- Piè di pagina ---------- */
@@ -475,7 +743,17 @@ h1, h2, h3, h4, p, ol {
     gap: 12px;
     flex-wrap: wrap;
     font-size: 0.85rem;
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
+}
+
+/* ================================================================
+   ANIMAZIONI DISATTIVATE (interruttore o preferenza del sistema)
+   ================================================================ */
+html[data-animazioni="off"] *,
+html[data-animazioni="off"] *::before,
+html[data-animazioni="off"] *::after {
+    animation: none !important;
+    transition: none !important;
 }
 
 /* ================================================================
@@ -487,7 +765,19 @@ h1, h2, h3, h4, p, ol {
     }
 
     .masthead h1 {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
+    }
+
+    .tabellone {
+        padding: 18px;
+    }
+
+    .tabellone-valore {
+        font-size: 3.2rem;
+    }
+
+    .tabellone-basen {
+        font-size: 2rem;
     }
 
     /* La tabella delle divisioni e il riquadro "lettura resti"
@@ -500,26 +790,42 @@ h1, h2, h3, h4, p, ol {
         flex-direction: row;
         gap: 12px;
     }
-
-    .arrow-graphic {
-        margin: 0;
-    }
 }
 
 /* ================================================================
    ADATTAMENTI PER SMARTPHONE (fino a 480px)
    ================================================================ */
 @media (max-width: 480px) {
+    /* Tabellone: due pannelli affiancati, senza il simbolo "=" */
+    .tabellone {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px 10px;
+    }
+
+    .tabellone-uguale {
+        display: none;
+    }
+
+    .tabellone-valore {
+        font-size: 2.6rem;
+    }
+
+    .tabellone-basen {
+        font-size: 1.35rem;
+        letter-spacing: 0.04em;
+    }
+
     .widget-card,
     .scheda-stampa {
-        padding: 14px;
+        padding: 16px;
     }
 
     .widget-title {
-        font-size: 1rem;
+        font-size: 1.05rem;
     }
 
-    /* Campi di input a piena larghezza: piu' comodi da compilare */
+    /* Campi di input e base a piena larghezza: piu' comodi da compilare */
     .input-row input[type="number"],
     .input-row input[type="text"] {
         width: 100%;
@@ -529,10 +835,14 @@ h1, h2, h3, h4, p, ol {
     .base-display {
         width: 100%;
     }
+
+    .masthead-azioni .btn {
+        flex: 1 1 100%;
+    }
 }
 
 /* ================================================================
-   STAMPA (PDF A4): grafica fedele allo schermo
+   STAMPA (PDF A4): due pagine, sempre tema chiaro, niente controlli
    ================================================================ */
 @page {
     margin: 16mm;
@@ -550,27 +860,62 @@ h1, h2, h3, h4, p, ol {
         max-width: none;
     }
 
-    /* Il pulsante di stampa non ha senso sulla copia cartacea */
-    .print-btn {
+    /* Pulsanti e controlli non hanno senso sulla copia cartacea */
+    .no-print {
         display: none;
     }
 
-    .masthead,
     .widget-card,
-    .scheda-stampa {
+    .scheda-stampa,
+    .tabellone {
         border-radius: 0;
         box-shadow: none;
     }
 
-    .masthead {
+    /* Il tabellone diventa un riquadro chiaro: risparmia inchiostro e resta leggibile */
+    .tabellone {
+        background-color: #ffffff;
         color: #000000;
-        background: #ffffff;
-        border-bottom: 2px solid var(--colore-primario);
+        border: 2px solid #000000;
+    }
+
+    .tabellone-etichetta,
+    .tabellone-uguale,
+    .tabellone-base {
+        color: #000000;
+    }
+
+    .tabellone-basen .attiva,
+    .tabellone-basen .zero {
+        color: #000000;
+    }
+
+    /* In stampa i colori non si distinguono: le cifre diverse da zero sono sottolineate */
+    .tabellone-basen .attiva {
+        text-decoration: underline;
+    }
+
+    .tabellone-pannello {
+        animation: none;
+    }
+
+    .legenda-cifre {
+        border: 1px solid #000000;
+    }
+
+    .masthead {
+        padding-left: 0;
+        padding-right: 0;
+        border-bottom: 2px solid #000000;
+        margin-bottom: 12px;
+    }
+
+    .masthead h1 {
+        color: #000000;
     }
 
     .masthead p {
         color: #333333;
-        opacity: 1;
     }
 
     .summary-table th,
