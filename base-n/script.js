@@ -2,7 +2,7 @@
     Autore:      prof. Michele SALVEMINI
     File:        script.js - comportamento di "Convertitore Base N <-> Base 10"
     Obiettivo:   Supporto allo studio delle conversioni di base da un sistema ad un altro
-    Versione:    3.1 (variante grafica "tabellone sportivo")
+    Versione:    3.1 (variante grafica)
     Data:        08/10/2026
 
     Struttura:
