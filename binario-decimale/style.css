@@ -1,32 +1,77 @@
 /*
     Autore:      prof. Michele SALVEMINI
     File:        style.css - stile di "Convertitore ed Eserciziario Binario-Decimale"
+                 (variante grafica "tabellone sportivo")
     Obiettivo:   Supporto allo studio delle conversioni di base da un sistema ad un altro
-    Versione:    2.0
-    Data:        26/09/2026
+    Versione:    3.1
+    Data:        08/10/2026
 
     Note di progetto:
-    - Dimensioni dei caratteri impostate in rem con base elevata (18px):
-      gli studenti BES/DSA e chi usa tablet/smartphone leggono meglio.
-    - I target tattili (bit, pulsanti, input) sono mantenuti su altezze
-      superiori a 44px, dimensione raccomandata per il tocco.
-    - La griglia a 8 bit diventa 4x2 sugli schermi stretti (smartphone):
-      le caselle restano grandi e toccabili con precisione.
+    - Ispirazione: le app sportive. Il tabellone mostra il "punteggio" (decimale e
+      binario), i bit sono schede con il peso come numero di maglia, le tabelle hanno
+      lo stile delle statistiche. Sono scelte solo visive: i testi didattici restano
+      quelli tecnici (peso, bit, resto, quoziente...).
+    - Il tabellone e' scuro sia nel tema chiaro sia in quello scuro: e' l'elemento
+      caratteristico della pagina; il resto resta sobrio.
+    - Un solo accento (verde). Raggi: --raggio per schede e riquadri, --raggio-piccolo
+      per controlli, forma a pillola solo per etichette e badge.
+    - Accessibilita' BES/DSA: base 18px, interlinea 1.6, testo a sinistra, nessun
+      maiuscolo o corsivo, contrasto elevato, target >= 48px. I bit accesi sono
+      distinti dal colore E dalla cifra scritta (0/1).
+    - Tema chiaro/scuro automatico (prefers-color-scheme). In stampa: sempre chiaro.
+    - Le animazioni si spengono con html[data-animazioni="off"], impostato da script.js.
 */
 
-/* ---------- Variabili di tema ---------- */
+/* ---------- Variabili di tema (chiaro) ---------- */
 :root {
-    --colore-primario: #1e3a8a;
-    --colore-accento: #2563eb;
-    --colore-testo: #1e293b;
-    --colore-testo-secondario: #475569;
-    --colore-testo-chiaro: #64748b;
-    --colore-bordo: #cbd5e1;
-    --colore-sfondo-pagina: #f1f5f9;
+    --colore-sfondo-pagina: #eef1f7;
     --colore-sfondo-card: #ffffff;
-    --colore-sfondo-soft: #f8fafc;
-    --colore-attivo: #eff6ff;
-    --raggio: 12px;
+    --colore-sfondo-soft: #f4f6fb;
+    --colore-testo: #0f1830;
+    --colore-testo-secondario: #4a5672;
+    --colore-bordo: #d3d9e6;
+    --colore-accento: #0b7a3e;             /* unico accento */
+    --colore-accento-testo: #ffffff;       /* testo su sfondo accento */
+    --colore-attivo: #e3f6ea;              /* tinta chiara dell'accento */
+    --colore-tasto-spento: #e6eaf3;
+    --colore-titolo: #0b1530;
+    --colore-focus: #1d4ed8;
+    --colore-primario: #0b1530;            /* intestazioni di tabella (pesi) */
+
+    /* Tabellone (scuro in entrambi i temi) */
+    --tabellone-sfondo: #0b1530;
+    --tabellone-testo: #ffffff;
+    --tabellone-secondario: #aab6d6;
+    --tabellone-uno: #b8f23a;
+    --tabellone-zero: #9aa7cc;
+    --tabellone-bordo: #24304f;
+
+    --raggio: 18px;
+    --raggio-piccolo: 12px;
+    --ombra: 0 1px 2px rgba(15, 24, 48, 0.06), 0 8px 24px rgba(15, 24, 48, 0.07);
+}
+
+/* ---------- Tema scuro (solo a schermo: la stampa resta chiara) ---------- */
+@media screen and (prefers-color-scheme: dark) {
+    :root {
+        --colore-sfondo-pagina: #060a16;
+        --colore-sfondo-card: #101933;
+        --colore-sfondo-soft: #0c1429;
+        --colore-testo: #eef2ff;
+        --colore-testo-secondario: #a3afcc;
+        --colore-bordo: #24304f;
+        --colore-accento: #b8f23a;
+        --colore-accento-testo: #0a1200;
+        --colore-attivo: #1a2c1c;
+        --colore-tasto-spento: #1a2442;
+        --colore-titolo: #b8f23a;
+        --colore-focus: #ffd84d;
+        --colore-primario: #1a2442;
+
+        --tabellone-sfondo: #101a38;
+        --tabellone-bordo: #2b3963;
+        --ombra: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
 }
 
 /* ---------- Base ---------- */
@@ -34,7 +79,7 @@
     box-sizing: border-box;
 }
 
-/* Base tipografica elevata: 1rem = 18px, ben visibile su tablet e smartphone */
+/* Base tipografica elevata: 1rem = 18px */
 html {
     font-size: 18px;
 }
@@ -45,7 +90,8 @@ body {
     max-width: 960px;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 1rem;
-    line-height: 1.55;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
     color: var(--colore-testo);
     background-color: var(--colore-sfondo-pagina);
 }
@@ -54,7 +100,7 @@ h1, h2, h3, h4, p, ol {
     margin-top: 0;
 }
 
-/* Testo solo per screen reader (es. didascalie delle tabelle) */
+/* Testo solo per screen reader (didascalie delle tabelle, set di icone) */
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -64,13 +110,80 @@ h1, h2, h3, h4, p, ol {
     white-space: nowrap;
 }
 
-/* ---------- Intestazione ---------- */
+/* ---------- Icone ---------- */
+.icona {
+    width: 1.3em;
+    height: 1.3em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Pulsanti ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;                 /* target tattile comodo */
+    padding: 0 18px;
+    border: 2px solid transparent;
+    border-radius: var(--raggio-piccolo);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:focus-visible,
+.bit-box:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--colore-focus);
+    outline-offset: 3px;
+}
+
+/* Azione principale (Stampa PDF) */
+.btn-pieno {
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
+}
+
+.btn-pieno:hover {
+    filter: brightness(1.08);
+}
+
+/* Azioni secondarie */
+.btn-contorno {
+    background-color: transparent;
+    color: var(--colore-accento);
+    border-color: var(--colore-accento);
+}
+
+.btn-contorno:hover {
+    background-color: var(--colore-attivo);
+}
+
+/* Stato dell'interruttore: testo (sì/no), non solo colore. Forma a pillola. */
+.stato {
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
+    border-radius: 999px;
+    padding: 0 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+/* ---------- Intestazione (barra dell'app) ---------- */
 .masthead {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-    color: #ffffff;
-    padding: 20px 24px;
-    border-radius: var(--raggio);
-    margin-bottom: 20px;
+    padding: 4px 4px 18px 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -80,67 +193,127 @@ h1, h2, h3, h4, p, ol {
 
 .masthead h1 {
     margin: 0;
-    font-size: 1.45rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    letter-spacing: -0.5px;
+    line-height: 1.25;
+    color: var(--colore-titolo);
 }
 
 .masthead p {
     margin: 6px 0 0 0;
+    max-width: 52ch;
     font-size: 0.95rem;
-    opacity: 0.92;
+    color: var(--colore-testo-secondario);
 }
 
-.print-btn {
-    background-color: #ffffff;
-    color: var(--colore-primario);
-    border: none;
-    padding: 12px 20px;
-    font-size: 0.95rem;
+.masthead-azioni {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Tabellone (elemento caratteristico) ---------- */
+.tabellone {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 26px;
+    margin-bottom: 22px;
+    background-color: var(--tabellone-sfondo);
+    color: var(--tabellone-testo);
+    border: 1px solid var(--tabellone-bordo);
+    border-radius: var(--raggio);
+    box-shadow: var(--ombra);
+}
+
+.tabellone-pannello {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.tabellone-etichetta {
+    font-size: 1rem;
     font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    min-height: 44px;   /* target tattile comodo */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    color: var(--tabellone-testo);
 }
 
-.print-btn:hover {
-    background-color: var(--colore-sfondo-soft);
+.tabellone-base {
+    font-size: 0.85rem;
+    color: var(--tabellone-secondario);
+}
+
+.tabellone-valore {
+    display: inline-block;             /* necessario per l'animazione di scala */
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabellone-binario {
+    font-size: 2.6rem;
+    letter-spacing: 0.08em;
+}
+
+/* Cifre del binario: l'1 e' evidenziato, lo 0 e' attenuato (ma sempre leggibile) */
+.tabellone-binario .uno {
+    color: var(--tabellone-uno);
+}
+
+.tabellone-binario .zero {
+    color: var(--tabellone-zero);
+}
+
+.tabellone-uguale {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--tabellone-secondario);
 }
 
 /* ---------- Schede dei widget ---------- */
 .widget-card {
     border: 1px solid var(--colore-bordo);
     border-radius: var(--raggio);
-    padding: 18px 20px;
+    padding: 22px 24px;
     background: var(--colore-sfondo-card);
-    margin-bottom: 20px;
+    box-shadow: var(--ombra);
+    margin-bottom: 22px;
 }
 
 .widget-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--colore-sfondo-pagina);
-    padding-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--colore-bordo);
 }
 
+/* Suggerimento: etichetta a pillola, come i filtri delle app */
 .widget-suggerimento {
-    font-size: 0.8rem;
-    color: var(--colore-testo-chiaro);
-    font-weight: 400;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--colore-testo-secondario);
+    background-color: var(--colore-sfondo-soft);
+    border: 1px solid var(--colore-bordo);
+    border-radius: 999px;
+    padding: 2px 12px;
 }
 
-/* ---------- Widget 1: griglia dei bit ---------- */
+/* ---------- Widget 1: i bit come schede giocatore ---------- */
 .bit-container {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 8px;
+    gap: 10px;
     margin: 14px 0;
 }
 
@@ -148,75 +321,111 @@ h1, h2, h3, h4, p, ol {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 4px;
+    padding: 10px 6px 8px 6px;
+    background-color: var(--colore-sfondo-soft);
+    border: 2px solid var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
+    transition: border-color 0.15s, background-color 0.15s;
 }
 
+/* La scheda del bit acceso si evidenzia (:has e' supportato dai browser recenti;
+   dove manca resta comunque evidenziato il tasto interno) */
+.bit-column:has(.bit-box.active) {
+    border-color: var(--colore-accento);
+    background-color: var(--colore-attivo);
+}
+
+/* Il peso e' il "numero di maglia" della scheda */
 .bit-weight {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--colore-testo-secondario);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--colore-testo);
 }
 
 .bit-power {
-    font-size: 0.75rem;
-    color: #94a3b8;
-    margin-bottom: 4px;
+    font-size: 0.85rem;
+    color: var(--colore-testo-secondario);
 }
 
-/* Le caselle dei bit sono veri pulsanti: grandi, con etichetta leggibile */
 .bit-box {
     width: 100%;
     min-height: 56px;
-    border: 2px solid var(--colore-bordo);
-    border-radius: 8px;
+    margin-top: 4px;
+    border: none;
+    border-radius: var(--raggio-piccolo);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.6rem;
     font-weight: 800;
     cursor: pointer;
-    background-color: var(--colore-sfondo-soft);
-    color: var(--colore-testo-chiaro);
-    font-family: inherit;
-    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    background-color: var(--colore-tasto-spento);
+    color: var(--colore-testo-secondario);
+    transition: transform 0.1s, background-color 0.15s, color 0.15s;
 }
 
 .bit-box:hover {
-    border-color: var(--colore-accento);
+    background-color: var(--colore-bordo);
 }
 
-/* Stato evidenziato + visibile anche a chi naviga da tastiera */
 .bit-box.active {
-    border-color: var(--colore-accento);
-    background-color: var(--colore-attivo);
-    color: #1d4ed8;
+    background-color: var(--colore-accento);
+    color: var(--colore-accento-testo);
 }
 
-.bit-box:focus-visible {
-    outline: 3px solid #93c5fd;
-    outline-offset: 2px;
+.bit-box.active:hover {
+    filter: brightness(1.08);
 }
 
+.bit-box:active {
+    transform: scale(0.94);
+}
+
+/* Contributo ai punti: "+32" se acceso, "0" se spento */
 .bit-subval {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #94a3b8;
-    margin-top: 4px;
-    min-height: 1.2em;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--colore-testo-secondario);
+    min-height: 1.4em;
 }
 
 .bit-subval.active {
     color: var(--colore-accento);
 }
 
-/* ---------- Riquadri dei risultati ---------- */
+/* Unico momento d'ingresso della pagina: le schede salgono in sequenza */
+@keyframes scheda-entra {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bit-container.intro .bit-column {
+    animation: scheda-entra 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+    animation-delay: calc(var(--i) * 55ms);
+}
+
+/* ---------- Riquadri dei risultati (sviluppo del calcolo) ---------- */
 .math-box {
     background-color: var(--colore-sfondo-soft);
-    border: 1px dashed var(--colore-bordo);
-    border-radius: 8px;
-    padding: 12px 14px;
-    text-align: center;
-    font-size: 1.05rem;
-    margin: 10px 0;
+    border: 1px solid var(--colore-bordo);
+    border-left: 5px solid var(--colore-accento);
+    border-radius: var(--raggio-piccolo);
+    padding: 14px 16px;
+    font-size: 1.1rem;
+    margin: 12px 0;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
 }
 
 /* ---------- Slider ---------- */
@@ -224,11 +433,12 @@ h1, h2, h3, h4, p, ol {
     display: flex;
     align-items: center;
     gap: 14px;
-    margin-top: 10px;
+    margin-top: 12px;
     flex-wrap: wrap;
 }
 
-.slider-row label {
+.slider-row label,
+.input-row label {
     font-weight: 600;
     color: var(--colore-testo-secondario);
 }
@@ -236,14 +446,16 @@ h1, h2, h3, h4, p, ol {
 .slider-row input[type="range"] {
     flex: 1;
     min-width: 180px;
-    min-height: 44px;   /* fascia di trascinamento comoda al tocco */
+    min-height: 48px;                  /* fascia di trascinamento comoda al tocco */
+    accent-color: var(--colore-accento);
 }
 
 .slider-val {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    min-width: 44px;
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--colore-accento);
+    min-width: 3ch;
     text-align: center;
 }
 
@@ -252,24 +464,21 @@ h1, h2, h3, h4, p, ol {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
 }
 
-.input-row label {
-    font-weight: 600;
-    color: var(--colore-testo-secondario);
-}
-
 .input-row input {
-    width: 100px;
+    width: 110px;
     padding: 10px 12px;
-    border: 1px solid var(--colore-bordo);
-    border-radius: 6px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #1d4ed8;
-    min-height: 44px;
+    border: 2px solid var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
+    background-color: var(--colore-sfondo-soft);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--colore-testo);
+    min-height: 48px;
 }
 
 /* Su schermi stretti la tabella scorre in orizzontale invece di restringersi */
@@ -281,66 +490,92 @@ h1, h2, h3, h4, p, ol {
 .division-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 14px;
+    gap: 16px;
     margin-top: 8px;
     align-items: stretch;
 }
 
+/* Tabella in stile "statistiche": intestazione tenue, righe a fasce alternate */
 .table-divs {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .table-divs th {
     text-align: left;
-    background: var(--colore-sfondo-pagina);
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--colore-bordo);
+    background: var(--colore-sfondo-soft);
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--colore-bordo);
     color: var(--colore-testo-secondario);
 }
 
 .table-divs td {
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--colore-sfondo-pagina);
+    padding: 10px 12px;
+}
+
+.table-divs tbody tr:nth-child(even) {
+    background-color: var(--colore-sfondo-soft);
 }
 
 .remainder-badge {
+    display: inline-block;
+    min-width: 2.2ch;
+    text-align: center;
     background-color: var(--colore-accento);
-    color: #ffffff;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 4px;
+    color: var(--colore-accento-testo);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-weight: 800;
+    padding: 2px 12px;
+    border-radius: 999px;
+}
+
+/* Le righe della tabella compaiono in sequenza (solo quando il numero cambia dal campo) */
+@keyframes riga-sale {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.riga-nuova {
+    animation: riga-sale 0.35s ease-out both;
+    animation-delay: calc(var(--i) * 60ms);
 }
 
 .arrow-box {
-    background: var(--colore-attivo);
-    border: 1px solid #bfdbfe;
-    border-radius: 8px;
-    padding: 12px;
+    background: var(--colore-sfondo-soft);
+    border: 1px solid var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
+    padding: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     text-align: center;
 }
 
 .arrow-label {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--colore-primario);
-    text-transform: uppercase;
+    color: var(--colore-testo);
 }
 
-.arrow-graphic {
-    font-size: 2rem;
+.icona-freccia {
+    width: 2.6rem;
+    height: 2.6rem;
     color: var(--colore-accento);
-    line-height: 1;
-    margin: 6px 0;
+    stroke-width: 2.5;
 }
 
 .arrow-sublabel {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--colore-testo-secondario);
     font-weight: 600;
 }
@@ -350,41 +585,52 @@ h1, h2, h3, h4, p, ol {
     background: var(--colore-sfondo-card);
     border: 1px solid var(--colore-bordo);
     border-radius: var(--raggio);
-    padding: 20px 24px;
+    box-shadow: var(--ombra);
+    padding: 22px 26px;
 }
 
 .scheda-intestazione {
-    border-bottom: 2px solid var(--colore-primario);
+    border-bottom: 3px solid var(--colore-accento);
     padding-bottom: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .scheda-intestazione h2 {
     margin: 0;
-    font-size: 1.25rem;
-    color: var(--colore-primario);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 1.3rem;
+    color: var(--colore-titolo);
 }
 
 .scheda-intestazione p {
     margin: 4px 0 0 0;
     font-size: 0.9rem;
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
 }
 
 .scheda-stampa h3 {
     font-size: 1.05rem;
-    margin: 18px 0 8px 0;
+    margin: 20px 0 8px 0;
 }
 
 .callout-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
     background-color: var(--colore-sfondo-soft);
-    border-left: 4px solid #3b82f6;
+    border-left: 5px solid var(--colore-accento);
     padding: 14px 16px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--raggio-piccolo) var(--raggio-piccolo) 0;
     margin: 12px 0;
-    line-height: 1.5;
+}
+
+.callout-box .icona {
+    color: var(--colore-accento);
+    margin-top: 0.15em;
+}
+
+.callout-box p {
+    margin: 0;
+    max-width: 68ch;
 }
 
 .summary-table {
@@ -392,23 +638,24 @@ h1, h2, h3, h4, p, ol {
     border-collapse: collapse;
     margin: 10px 0;
     font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
 }
 
 .summary-table th {
     background-color: var(--colore-primario);
     color: #ffffff;
-    padding: 8px 10px;
+    padding: 10px 12px;
     text-align: left;
 }
 
 .summary-table tbody th {
-    background-color: var(--colore-sfondo-pagina);
+    background-color: var(--colore-sfondo-soft);
     color: var(--colore-testo);
 }
 
 .summary-table td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--colore-bordo);
     text-align: center;
 }
 
@@ -418,8 +665,8 @@ h1, h2, h3, h4, p, ol {
 }
 
 .procedura {
-    line-height: 1.6;
-    color: #334155;
+    line-height: 1.7;
+    max-width: 68ch;
     padding-left: 24px;
 }
 
@@ -428,21 +675,20 @@ h1, h2, h3, h4, p, ol {
 }
 
 .esercizio-box {
-    margin-top: 18px;
-    border: 1px dashed var(--colore-bordo);
-    border-radius: 8px;
+    margin-top: 20px;
+    border: 2px dashed var(--colore-bordo);
+    border-radius: var(--raggio-piccolo);
     padding: 16px;
-    background: #fafafa;
+    background: var(--colore-sfondo-soft);
 }
 
 .esercizio-box h4 {
     margin: 0 0 8px 0;
-    font-size: 0.95rem;
-    color: var(--colore-testo-secondario);
+    font-size: 1rem;
 }
 
 .esercizio-box > p {
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
     margin-bottom: 12px;
 }
 
@@ -454,30 +700,38 @@ h1, h2, h3, h4, p, ol {
 
 .esercizio-codice {
     flex: 1 1 260px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--colore-sfondo-card);
+    border: 1px solid var(--colore-bordo);
     padding: 12px;
-    border-radius: 4px;
-    font-family: "Courier New", monospace;
+    border-radius: var(--raggio-piccolo);
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0;
     overflow-x: auto;
 }
 
 .esercizio-soluzione {
     flex: 1 1 260px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--colore-sfondo-card);
+    border: 1px solid var(--colore-bordo);
     padding: 12px;
-    border-radius: 4px;
+    border-radius: var(--raggio-piccolo);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 .esercizio-soluzione p {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
     margin: 4px 0;
+}
+
+.esercizio-soluzione .icona {
+    color: var(--colore-accento);
+    align-self: center;
 }
 
 /* ---------- Piè di pagina ---------- */
@@ -491,7 +745,17 @@ h1, h2, h3, h4, p, ol {
     gap: 12px;
     flex-wrap: wrap;
     font-size: 0.85rem;
-    color: var(--colore-testo-chiaro);
+    color: var(--colore-testo-secondario);
+}
+
+/* ================================================================
+   ANIMAZIONI DISATTIVATE (interruttore o preferenza del sistema)
+   ================================================================ */
+html[data-animazioni="off"] *,
+html[data-animazioni="off"] *::before,
+html[data-animazioni="off"] *::after {
+    animation: none !important;
+    transition: none !important;
 }
 
 /* ================================================================
@@ -503,7 +767,19 @@ h1, h2, h3, h4, p, ol {
     }
 
     .masthead h1 {
-        font-size: 1.25rem;
+        font-size: 1.3rem;
+    }
+
+    .tabellone {
+        padding: 18px;
+    }
+
+    .tabellone-valore {
+        font-size: 3.2rem;
+    }
+
+    .tabellone-binario {
+        font-size: 2rem;
     }
 
     /* La tabella delle divisioni e il riquadro "lettura resti"
@@ -516,29 +792,45 @@ h1, h2, h3, h4, p, ol {
         flex-direction: row;
         gap: 12px;
     }
-
-    .arrow-graphic {
-        margin: 0;
-    }
 }
 
 /* ================================================================
    ADATTAMENTI PER SMARTPHONE (fino a 480px)
    ================================================================ */
 @media (max-width: 480px) {
+    /* Tabellone: due pannelli affiancati, senza il simbolo "=" */
+    .tabellone {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 14px 10px;
+    }
+
+    .tabellone-uguale {
+        display: none;
+    }
+
+    .tabellone-valore {
+        font-size: 2.6rem;
+    }
+
+    .tabellone-binario {
+        font-size: 1.35rem;
+        letter-spacing: 0.04em;
+    }
+
     /* La griglia dei bit diventa 4 colonne x 2 righe:
-       ogni casella resta ampia e toccabile con precisione */
+       ogni scheda resta ampia e toccabile con precisione */
     .bit-container {
         grid-template-columns: repeat(4, 1fr);
     }
 
     .widget-card,
     .scheda-stampa {
-        padding: 14px;
+        padding: 16px;
     }
 
     .widget-title {
-        font-size: 1rem;
+        font-size: 1.05rem;
     }
 
     /* Campo numerico a tutta larghezza: piu' comodo da compilare */
@@ -546,10 +838,14 @@ h1, h2, h3, h4, p, ol {
         width: 100%;
         flex: 1 1 100%;
     }
+
+    .masthead-azioni .btn {
+        flex: 1 1 100%;
+    }
 }
 
 /* ================================================================
-   STAMPA (PDF A4): due pagine, grafica fedele allo schermo
+   STAMPA (PDF A4): due pagine, sempre tema chiaro, niente controlli
    ================================================================ */
 @page {
     margin: 16mm;
@@ -567,32 +863,72 @@ h1, h2, h3, h4, p, ol {
         max-width: none;
     }
 
-    /* Il pulsante di stampa non ha senso sulla copia cartacea */
-    .print-btn {
+    /* Pulsanti e controlli non hanno senso sulla copia cartacea */
+    .no-print {
         display: none;
     }
 
-    .masthead,
     .widget-card,
-    .scheda-stampa {
+    .scheda-stampa,
+    .tabellone {
         border-radius: 0;
         box-shadow: none;
+    }
+
+    /* Il tabellone diventa un riquadro chiaro: risparmia inchiostro e resta leggibile */
+    .tabellone {
+        background-color: #ffffff;
+        color: #000000;
+        border: 2px solid #000000;
+    }
+
+    .tabellone-etichetta,
+    .tabellone-uguale,
+    .tabellone-base {
+        color: #000000;
+    }
+
+    .tabellone-binario .uno,
+    .tabellone-binario .zero {
+        color: #000000;
+    }
+
+    .tabellone-binario .uno {
+        text-decoration: underline;
+    }
+
+    .bit-container.intro .bit-column {
+        animation: none;
+    }
+
+    .bit-column {
+        border: 1px solid #000000;
+        background: #ffffff;
     }
 
     .bit-box {
         min-height: 44px;
         font-size: 1.2rem;
+        border: 2px solid #666666;
+    }
+
+    .bit-box.active {
+        border-color: #000000;
     }
 
     .masthead {
+        padding-left: 0;
+        padding-right: 0;
+        border-bottom: 2px solid #000000;
+        margin-bottom: 12px;
+    }
+
+    .masthead h1 {
         color: #000000;
-        background: #ffffff;
-        border-bottom: 2px solid var(--colore-primario);
     }
 
     .masthead p {
         color: #333333;
-        opacity: 1;
     }
 
     .summary-table th,

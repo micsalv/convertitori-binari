@@ -5,15 +5,19 @@
     Argomento:   Sistemi di numerazione - conversioni di base
     Obiettivo:   Supporto allo studio delle conversioni di base da un sistema
                  ad un altro (binario <-> decimale)
-    Versione:    2.0
-    Data:        26/09/2026
-    Note:        Revisione HTML5, responsive, con adattamenti per studenti
-                 BES/DSA (caratteri ampliati, target tattili ampi).
+    Versione:    3.1 (variante grafica "tabellone sportivo")
+    Data:        08/10/2026
+    Note:        Variante ispirata alle app sportive: tabellone con il valore decimale
+                 e binario, bit come schede, tabelle in stile statistiche.
+                 Contenuti e logica didattica invariati rispetto alla 3.0.
+                 Accessibilita' BES/DSA: interruttore per le animazioni, niente testo
+                 in maiuscolo, target tattili ampi, contrasto elevato.
 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <meta name="description" content="Supporto allo studio delle conversioni di base da un sistema ad un altro: convertitore interattivo binario-decimale con metodo posizionale e divisioni successive.">
     <meta name="author" content="prof. Michele SALVEMINI">
     <title>Convertitore ed Eserciziario Binario-Decimale</title>
@@ -21,14 +25,78 @@
 </head>
 <body>
 
+    <!-- Set di icone (SVG inline): nessuna dipendenza esterna, funziona anche offline -->
+    <svg class="visually-hidden" aria-hidden="true" focusable="false">
+        <symbol id="i-stampa" viewBox="0 0 24 24">
+            <path d="M6 9V3h12v6"/>
+            <rect x="4" y="9" width="16" height="8" rx="2"/>
+            <path d="M7 14h10v7H7z"/>
+        </symbol>
+        <symbol id="i-freccia-su" viewBox="0 0 24 24">
+            <path d="M12 19V5"/>
+            <path d="M5 12l7-7 7 7"/>
+        </symbol>
+        <symbol id="i-dado" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="4"/>
+            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+        </symbol>
+        <symbol id="i-azzera" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+            <path d="M3 3v5h5"/>
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 11v5"/>
+            <path d="M12 8h.01"/>
+        </symbol>
+        <symbol id="i-spunta" viewBox="0 0 24 24">
+            <path d="M5 12l5 5 9-10"/>
+        </symbol>
+        <symbol id="i-scintille" viewBox="0 0 24 24">
+            <path d="M12 3l2.2 6.3L21 12l-6.8 2.7L12 21l-2.2-6.3L3 12l6.8-2.7z"/>
+        </symbol>
+    </svg>
+
     <!-- Intestazione del documento -->
     <header class="masthead">
-        <div>
+        <div class="masthead-testo">
             <h1>Convertitore Posizionale Binario &harr; Decimale</h1>
             <p>Strumento didattico interattivo per la notazione posizionale e il metodo delle divisioni successive.</p>
         </div>
-        <button type="button" id="pulsante-stampa" class="print-btn">Stampa PDF</button>
+        <div class="masthead-azioni no-print">
+            <!-- Interruttore: l'utente decide se vedere le animazioni -->
+            <button type="button" id="pulsante-animazioni" class="btn btn-contorno" role="switch" aria-checked="true">
+                <svg class="icona" aria-hidden="true"><use href="#i-scintille"></use></svg>
+                <span>Animazioni</span>
+                <span class="stato" id="stato-animazioni" aria-hidden="true">s&igrave;</span>
+            </button>
+            <button type="button" id="pulsante-stampa" class="btn btn-pieno">
+                <svg class="icona" aria-hidden="true"><use href="#i-stampa"></use></svg>
+                <span>Stampa PDF</span>
+            </button>
+        </div>
     </header>
+
+    <!-- Tabellone: riassume lo stato corrente (valore decimale e binario).
+         E' solo visivo (aria-hidden): le stesse informazioni sono annunciate
+         dai riquadri dei risultati, che hanno aria-live -->
+    <section class="tabellone" aria-hidden="true">
+        <div class="tabellone-pannello">
+            <span class="tabellone-etichetta">Decimale</span>
+            <span class="tabellone-valore" id="tabellone-decimale">45</span>
+            <span class="tabellone-base">base 10</span>
+        </div>
+        <span class="tabellone-uguale">=</span>
+        <div class="tabellone-pannello">
+            <span class="tabellone-etichetta">Binario</span>
+            <span class="tabellone-valore tabellone-binario" id="tabellone-binario">00101101</span>
+            <span class="tabellone-base">base 2, 8 bit</span>
+        </div>
+    </section>
 
     <main>
 
@@ -39,8 +107,8 @@
                 <span class="widget-suggerimento">Tocca le caselle dei bit per modificarli</span>
             </h2>
 
-            <!-- Griglia dei bit: popolata da script.js -->
-            <div class="bit-container" id="griglia-bit"></div>
+            <!-- Griglia dei bit: costruita una sola volta da script.js -->
+            <div class="bit-container intro" id="griglia-bit"></div>
 
             <p class="math-box" id="risultato-b2d" aria-live="polite"></p>
 
@@ -48,6 +116,10 @@
                 <label for="slider-decimale">Valore decimale:</label>
                 <input type="range" id="slider-decimale" min="0" max="255" value="45">
                 <output class="slider-val" id="display-decimale" for="slider-decimale">45</output>
+                <button type="button" id="pulsante-azzera" class="btn btn-contorno no-print">
+                    <svg class="icona" aria-hidden="true"><use href="#i-azzera"></use></svg>
+                    <span>Azzera i bit</span>
+                </button>
             </div>
         </section>
 
@@ -61,6 +133,10 @@
             <div class="input-row">
                 <label for="input-decimale">Inserisci numero decimale (0-255):</label>
                 <input type="number" id="input-decimale" min="0" max="255" value="45">
+                <button type="button" id="pulsante-casuale" class="btn btn-contorno no-print">
+                    <svg class="icona" aria-hidden="true"><use href="#i-dado"></use></svg>
+                    <span>Numero a caso</span>
+                </button>
             </div>
 
             <div class="division-grid">
@@ -80,7 +156,7 @@
                 </div>
                 <div class="arrow-box">
                     <span class="arrow-label">Lettura resti</span>
-                    <div class="arrow-graphic" aria-hidden="true">&uarr;</div>
+                    <svg class="icona icona-freccia" id="icona-freccia" aria-hidden="true"><use href="#i-freccia-su"></use></svg>
                     <span class="arrow-sublabel">Dal basso (MSB) all'alto (LSB)</span>
                 </div>
             </div>
@@ -96,10 +172,13 @@
             </div>
 
             <div class="callout-box">
-                <strong>Regola generale di conversione:</strong><br>
-                Nel sistema numerico binario (base 2), ogni cifra (bit) assume un peso
-                posizionale pari a una potenza intera di 2, a partire da 2<sup>0</sup>
-                per il bit meno significativo (LSB) all'estrema destra.
+                <svg class="icona" aria-hidden="true"><use href="#i-info"></use></svg>
+                <p>
+                    <strong>Regola generale di conversione:</strong><br>
+                    Nel sistema numerico binario (base 2), ogni cifra (bit) assume un peso
+                    posizionale pari a una potenza intera di 2, a partire da 2<sup>0</sup>
+                    per il bit meno significativo (LSB) all'estrema destra.
+                </p>
             </div>
 
             <h3>Tabella dei Pesi Posizionali a 8 Bit (1 Byte)</h3>
@@ -159,8 +238,14 @@
  2 &divide; 2 =  1 (resto 0)
  1 &divide; 2 =  0 (resto 1)</pre>
                     <div class="esercizio-soluzione">
-                        <p><strong>Risultato:</strong> 01001101<sub>2</sub></p>
-                        <p><strong>Riprova:</strong> 64 + 8 + 4 + 1 = 77<sub>10</sub></p>
+                        <p>
+                            <svg class="icona" aria-hidden="true"><use href="#i-spunta"></use></svg>
+                            <span><strong>Risultato:</strong> 01001101<sub>2</sub></span>
+                        </p>
+                        <p>
+                            <svg class="icona" aria-hidden="true"><use href="#i-spunta"></use></svg>
+                            <span><strong>Riprova:</strong> 64 + 8 + 4 + 1 = 77<sub>10</sub></span>
+                        </p>
                     </div>
                 </div>
             </div>
